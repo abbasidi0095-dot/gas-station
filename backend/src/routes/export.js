@@ -39,6 +39,7 @@ async function getExportData({ startDate, endDate, exportType, vendorId, categor
   if (vendorId) receiptWhere.vendorId = vendorId;
 
   const revenueWhere = { date: { gte: startDate, lte: endDate } };
+  if (vendorId) revenueWhere.vendorId = vendorId;
   if (category) revenueWhere.category = category;
 
   let revenues = [];

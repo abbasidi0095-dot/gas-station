@@ -376,9 +376,10 @@ export async function generatePDFExport({ range, startDate, endDate, revenues, c
       // Logo row
       doc.image(almohitPng, 200, 45, { width: 40 });
       doc.image(afriquiaPng, 262, 45, { width: 100 });
-      doc.y = 95;
+      doc.y = 93;
 
-      doc.fillColor('#1F4E78').fontSize(18).font('Helvetica-Bold').text('RELEVÉ DE LA STATION AL MOHIT', { align: 'center' });
+      doc.fillColor('#1F4E78').fontSize(10).font('Helvetica-Bold').text('N HOLDING DAKHLA (AL MOHIT)', { align: 'center' });
+      doc.fillColor('#1F4E78').fontSize(16).font('Helvetica-Bold').text('RELEVÉ DE LA STATION', { align: 'center' });
       doc.moveTo(50, doc.y).lineTo(562, doc.y).strokeColor('#1F4E78').lineWidth(1.5).stroke();
       doc.moveDown(1);
 
