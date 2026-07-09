@@ -297,7 +297,7 @@ export default function ReceiptScanner({ onClose, onScanComplete }) {
                     <button
                       onClick={handleConfirmFile}
                       disabled={filing}
-                      className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-bold rounded-lg text-sm flex items-center justify-center space-x-2 transition-all"
+                      className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-bold rounded-xl text-sm flex items-center justify-center space-x-2 transition-all shadow-md"
                     >
                       {filing ? <RefreshCw className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
                       <span>{filing ? t('filing') : t('confirmFile')}</span>
@@ -305,7 +305,7 @@ export default function ReceiptScanner({ onClose, onScanComplete }) {
                     <button
                       onClick={resetAll}
                       disabled={filing}
-                      className="w-full py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-white font-bold rounded-lg text-sm transition-all"
+                      className="w-full py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-white font-bold rounded-xl text-sm transition-all border border-slate-200 dark:border-slate-700"
                     >
                       {t('addAnother')}
                     </button>
@@ -341,7 +341,7 @@ export default function ReceiptScanner({ onClose, onScanComplete }) {
                       </div>
                     </div>
                   )}
-                  <button onClick={resetAll} className="w-full mt-6 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-white font-bold rounded-lg text-sm transition-all">
+                  <button onClick={resetAll} className="w-full mt-6 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-white font-bold rounded-xl text-sm transition-all border border-slate-200 dark:border-slate-700">
                     {t('addAnother')}
                   </button>
                 </div>
@@ -350,7 +350,7 @@ export default function ReceiptScanner({ onClose, onScanComplete }) {
                   <div className="p-3 bg-red-100 rounded-full text-red-600 mb-3"><AlertCircle className="h-10 w-10" /></div>
                   <h4 className="font-bold text-slate-900 dark:text-slate-50 text-md">{t('entryFailed')}</h4>
                   <p className="text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500 mt-2 max-w-xs">{scanResult.message}</p>
-                  <button onClick={resetAll} className="mt-6 px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold transition-all">{t('tryAgain')}</button>
+                  <button onClick={resetAll} className="mt-6 px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-bold transition-all shadow-md">{t('tryAgain')}</button>
                 </div>
               )}
             </div>
@@ -377,8 +377,8 @@ export default function ReceiptScanner({ onClose, onScanComplete }) {
                     <div className="relative w-full aspect-[3/4] max-h-80 bg-black rounded-xl overflow-hidden border border-slate-800">
                       <video ref={videoRef} autoPlay playsInline className="w-full h-full object-cover" />
                       <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-3 z-10">
-                        <button type="button" onClick={capturePhoto} className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg text-sm flex items-center space-x-2"><Camera className="h-4 w-4" /><span>{t('useCamera')}</span></button>
-                        <button type="button" onClick={stopCamera} className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium rounded-lg text-sm">{t('cancel')}</button>
+                        <button type="button" onClick={capturePhoto} className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-sm flex items-center space-x-2 shadow-lg"><Camera className="h-4 w-4" /><span>{t('useCamera')}</span></button>
+                        <button type="button" onClick={stopCamera} className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-sm transition-colors">{t('cancel')}</button>
                       </div>
                     </div>
                   ) : (
@@ -400,9 +400,9 @@ export default function ReceiptScanner({ onClose, onScanComplete }) {
                         </div>
                       )}
                       <div className="w-full flex space-x-3 mt-6">
-                        <button type="button" onClick={startCamera} className="flex-1 py-2.5 border border-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 dark:bg-slate-800/50 text-slate-700 dark:text-slate-300 font-semibold rounded-lg text-sm flex items-center justify-center space-x-2"><Camera className="h-4 w-4" /><span>{t('useCamera')}</span></button>
+                        <button type="button" onClick={startCamera} className="flex-1 py-2.5 border border-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 dark:bg-slate-800/50 text-slate-700 dark:text-slate-300 font-bold rounded-xl text-sm flex items-center justify-center space-x-2 transition-all"><Camera className="h-4 w-4" /><span>{t('useCamera')}</span></button>
                         {file && (
-                          <button type="button" onClick={handleScanUpload} className="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg text-sm flex items-center justify-center space-x-2"><Sparkles className="h-4 w-4" /><span>{t('analyzeAI')}</span></button>
+                          <button type="button" onClick={handleScanUpload} className="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-sm flex items-center justify-center space-x-2 transition-all shadow-md"><Sparkles className="h-4 w-4" /><span>{t('analyzeAI')}</span></button>
                         )}
                       </div>
                     </div>
@@ -446,7 +446,7 @@ export default function ReceiptScanner({ onClose, onScanComplete }) {
                 <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">{t('receiptImage')}</label>
                 <input type="file" onChange={handleFileChange} accept="image/*,application/pdf" className="w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:bg-indigo-50 file:text-indigo-700 file:font-semibold" />
               </div>
-              <button type="submit" disabled={manualSubmitting} className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-bold rounded-lg text-sm flex items-center justify-center space-x-2">
+              <button type="submit" disabled={manualSubmitting} className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-bold rounded-xl text-sm flex items-center justify-center space-x-2 shadow-md">
                 {manualSubmitting ? <RefreshCw className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
                 <span>{manualSubmitting ? t('filing') : t('fileReceipt')}</span>
               </button>
