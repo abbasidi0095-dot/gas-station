@@ -6,7 +6,8 @@ import {
   PieChart, Pie, Cell
 } from 'recharts';
 import {
-  TrendingUp, TrendingDown, Landmark, Sparkles, FileOutput, Calendar, RefreshCcw, AlertOctagon, Building2, Receipt
+  TrendingUp, TrendingDown, Landmark, Sparkles, FileOutput, Calendar, RefreshCcw, AlertOctagon, Building2, Receipt,
+  Percent, Award, Lightbulb, Coins
 } from 'lucide-react';
 import ReceiptScanner from '../components/ReceiptScanner.jsx';
 import ExportModal from '../components/ExportModal.jsx';
@@ -53,6 +54,14 @@ export default function Dashboard() {
 
   useEffect(() => { fetchDashboardData(); }, [range]);
 
+  useEffect(() => {
+    const handleScanComplete = () => {
+      fetchDashboardData();
+    };
+    window.addEventListener('scan-complete', handleScanComplete);
+    return () => window.removeEventListener('scan-complete', handleScanComplete);
+  }, [range]);
+
   const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#64748b'];
 
   return (
@@ -64,6 +73,9 @@ export default function Dashboard() {
           <p className="text-sm text-slate-500 dark:text-slate-400">{t('dashboardDesc')}</p>
         </div>
         <div className="flex items-center space-x-2.5">
+          <button onClick={() => window.dispatchEvent(new CustomEvent('open-quick-add'))} className="px-4 py-2 bg-slate-950 hover:bg-slate-900 text-white font-bold text-sm rounded-xl shadow-md flex items-center space-x-2 transition-all">
+            <Sparkles className="h-4 w-4 text-indigo-400" /><span>Saisie Rapide IA</span>
+          </button>
           <button onClick={() => setScannerOpen(true)} className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl shadow-md flex items-center space-x-2 transition-all">
             <Sparkles className="h-4 w-4" /><span>{t('smartScan')}</span>
           </button>
@@ -145,6 +157,79 @@ export default function Dashboard() {
               <div className={`p-3 rounded-xl ${data.summary.netProfit >= 0 ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400' : 'bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400'}`}><Landmark className="h-6 w-6" /></div>
             </div>
           </div>
+
+          {/* Smart Insights Cards (Innovation & Improvement) */}
+          {(() => {
+            const numDays = range === 'week' ? 7 : range === 'year' ? 365 : 30;
+            const avgDailyRev = data.summary.totalRevenue / numDays;
+            const opMargin = data.summary.totalRevenue > 0 ? (data.summary.netProfit / data.summary.totalRevenue) * 100 : 0;
+            const maxExpense = data.expenseCategories.reduce((max, c) => c.value > max.value ? c : max, { name: '—', value: 0 });
+            const totalExp = data.summary.totalCharges || 1;
+            const expPct = ((maxExpense.value / totalExp) * 100).toFixed(0);
+
+            return (
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
+                {/* Metric 1: Operating Margin */}
+                <div className="bg-slate-900 text-white p-5 rounded-2xl border border-slate-800 shadow-lg flex flex-col justify-between">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Marge d'Exploitation</span>
+                    <Percent className="h-4 w-4 text-indigo-400" />
+                  </div>
+                  <div>
+                    <h4 className="text-2xl font-black text-indigo-300">{opMargin.toFixed(1)}%</h4>
+                    <p className="text-xs text-slate-400 mt-1">
+                      {opMargin > 15 
+                        ? 'Excellente rentabilité opérationnelle ce mois.' 
+                        : opMargin > 0 
+                        ? 'Rentabilité opérationnelle dans la moyenne saine.' 
+                        : 'Marge déficitaire. Attention aux frais fixes.'}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Metric 2: Average Daily Revenue */}
+                <div className="bg-white dark:bg-slate-800/80 p-5 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm flex flex-col justify-between">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Revenu Journalier Moyen</span>
+                    <Coins className="h-4 w-4 text-emerald-500" />
+                  </div>
+                  <div>
+                    <h4 className="text-2xl font-black text-slate-900 dark:text-slate-50">{avgDailyRev.toLocaleString(undefined, { maximumFractionDigits: 0 })} <span className="text-xs font-semibold text-slate-400">DH/jour</span></h4>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Sur la base d'une période d'analyse de {numDays} jours.</p>
+                  </div>
+                </div>
+
+                {/* Metric 3: Primary Cost Driver */}
+                <div className="bg-white dark:bg-slate-800/80 p-5 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm flex flex-col justify-between">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Poste Principal de Frais</span>
+                    <Award className="h-4 w-4 text-amber-500" />
+                  </div>
+                  <div>
+                    <h4 className="text-2xl font-black text-slate-900 dark:text-slate-50 capitalize">{maxExpense.name === 'salary' ? 'Salaires' : catLabel(maxExpense.name)}</h4>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Représente {expPct}% de vos charges d'exploitation totales.</p>
+                  </div>
+                </div>
+
+                {/* Metric 4: AI Smart Tip */}
+                <div className="bg-indigo-50 dark:bg-indigo-950/30 p-5 rounded-2xl border border-indigo-100 dark:border-indigo-900/50 shadow-sm flex flex-col justify-between">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-[10px] font-bold text-indigo-700 dark:text-indigo-400 uppercase tracking-widest">Conseil d'Optimisation</span>
+                    <Lightbulb className="h-4 w-4 text-indigo-600 dark:text-indigo-400 animate-pulse" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-indigo-950 dark:text-indigo-200 font-semibold leading-relaxed">
+                      {maxExpense.name === 'salary' 
+                        ? 'Optimisez les horaires d\'équipe du personnel pour réduire les coûts salariaux marginaux.' 
+                        : maxExpense.name === 'fuel_purchase' 
+                        ? 'Négociez des remises sur volume auprès de vos fournisseurs de carburant.' 
+                        : 'Vérifiez la facturation de vos frais généraux de la station.'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
 
           {/* Trend Chart */}
           <div className="bg-white dark:bg-slate-800/80 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm dark:shadow-slate-900/50 space-y-4">
