@@ -690,7 +690,7 @@ export const t = {
 export function LanguageProvider({ children }) {
   const [lang, setLang] = useState(() => {
     const saved = localStorage.getItem('almohit_lang');
-    return saved && t[saved] ? saved : 'en';
+    return saved && t[saved] ? saved : 'fr';
   });
 
   const dir = languages[lang].dir;

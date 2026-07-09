@@ -5,7 +5,7 @@ const ThemeContext = createContext();
 export function ThemeProvider({ children }) {
   const [theme, setTheme] = useState(() => {
     const saved = localStorage.getItem('almohit_theme');
-    return saved || 'dark';
+    return saved || 'light';
   });
 
   useEffect(() => {
@@ -30,6 +30,6 @@ export function ThemeProvider({ children }) {
 
 export function useTheme() {
   const ctx = useContext(ThemeContext);
-  if (!ctx) return { theme: 'dark', toggleTheme: () => {} };
+  if (!ctx) return { theme: 'light', toggleTheme: () => {} };
   return ctx;
 }
