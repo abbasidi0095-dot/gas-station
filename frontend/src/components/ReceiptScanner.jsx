@@ -110,7 +110,7 @@ export default function ReceiptScanner({ onClose, onScanComplete }) {
       const receipt = scanItem ? scanItem.receipt : data.receipt;
       setVVendorId(receipt.vendorId || '');
       setVAmount(receipt.amount != null ? String(receipt.amount) : '');
-      setVDate(receipt.scannedAt ? receipt.scannedAt.split('T')[0] : '');
+      setVDate(receipt.date || (receipt.scannedAt ? receipt.scannedAt.split('T')[0] : ''));
       setVCategory('fuel_purchase');
       setVDescription('');
       setVConfidence(receipt.confidenceScore || 0);

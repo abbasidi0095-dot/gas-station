@@ -51,7 +51,7 @@ export default function SoldGas() {
   const loadReceipt = (rc) => {
     setVVendorId(rc.vendorId || '');
     setVAmount(rc.amount != null ? String(rc.amount) : '');
-    setVDate(rc.scannedAt ? rc.scannedAt.split('T')[0] : new Date().toISOString().split('T')[0]);
+    setVDate(rc.date || (rc.scannedAt ? rc.scannedAt.split('T')[0] : ''));
     setVFuelType(rc.fuelType || 'gasoil');
     setVDescription(rc.extractedRawText || '');
   };

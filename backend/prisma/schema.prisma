@@ -57,6 +57,7 @@ model Receipt {
   vendor           Vendor?  @relation(fields: [vendorId], references: [id])
   amount           Float?
   currency         String?  @default("MAD")
+  date             String?  // OCR-extracted receipt date in YYYY-MM-DD
   extractedRawText String?
   confidenceScore  Float?
   status           String   // "pending_review" | "confirmed" | "rejected"
