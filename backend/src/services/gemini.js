@@ -251,18 +251,28 @@ Extract or refine these fields:
 7. "description": A clean description in French summarizing the transaction (e.g. "Achat carburant Afriquia", "Salaire de Hassan").
 8. "fuelType": (Specifically if category is "fuel_purchase") must be "gasoil" or "essence". If category is not "fuel_purchase", set to null.
 
-**Determination of Status and Next Question:**
+**Determination of Status, Next Question and Options:**
 - "type" and "amount" are Strictly Required. If either is missing, set "status" to "incomplete" and set "prompt" to a friendly question in French asking for them.
+  - If "type" is missing, provide logical options: ["Dépense (Charge)", "Revenu (Recette)", "Salaire"]
+  - If "amount" is missing, provide logical options: ["Passer / Ignorer"]
 - If "type" and "amount" are known, but some recommended fields ("vendor", "date", or "fuelType" for "fuel_purchase") are missing or "unknown", evaluate if we should ask for them.
   - CRITICAL: Never ask the same question twice! Check the Previous Assistant Prompt ("${context ? context.previousPrompt : ''}"). If you already asked about a field (like asking for vendor name or fuel type) and it is still missing/unknown in the user's latest response, do NOT ask again. Mark the status as "complete" instead.
-  - If a recommended field is missing and has NOT been asked yet, set "status" to "incomplete" and set "prompt" to a friendly question in French asking for that specific detail (e.g., "Quel est le fournisseur (vendor) ?" or "S'agit-il de gasoil ou d'essence ?").
+  - If a recommended field is missing and has NOT been asked yet, set "status" to "incomplete" and set "prompt" to a friendly question in French asking for that specific detail.
+    - If asking for "fuelType": provide options: ["Gasoil", "Essence", "Passer / Ignorer"]
+    - If asking for "category" of charge: provide options: ["Achat Carburant", "Eau et électricité", "Produits de nettoyage", "Loyer", "Maintenance", "Autre"]
+    - If asking for "category" of revenue: provide options: ["Ventes de carburant", "Ventes boutique", "Services", "Autre"]
+    - If asking for "vendor": provide options: ["Afriquia", "Al Mohit", "Passer / Ignorer"]
+    - If asking for "date": provide options: ["Aujourd'hui", "Hier", "Passer / Ignorer"]
   - If everything is complete, set "status" to "complete" and "prompt" to null.
+  
+- Whenever "status" is "incomplete", populate the "options" field with an array of 2-5 short text button strings that represent logical choices/answers the user can click instead of typing. Include a "Passer / Ignorer" option where appropriate to make skipping easy. If "status" is "complete", set "options" to null.
 
 Return ONLY raw JSON, with no markdown code blocks, no formatting, and no explanation.
 JSON Schema to return:
 {
   "status": "complete" | "incomplete",
   "prompt": "friendly query in French if status is incomplete, else null",
+  "options": ["Option 1", "Option 2", ...] | null,
   "transaction": {
     "type": "charge" | "revenue" | "salary" | null,
     "category": "string" | null,

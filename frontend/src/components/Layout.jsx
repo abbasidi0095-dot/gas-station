@@ -34,12 +34,10 @@ export default function Layout({ children }) {
     return () => window.removeEventListener('open-quick-add', handleOpen);
   }, []);
 
-  const handleQuickAdd = async (e) => {
-    e.preventDefault();
-    if (!quickText.trim()) return;
+  const submitQuickText = async (textValue) => {
+    if (!textValue.trim()) return;
 
-    const userMsg = quickText;
-    setChatHistory(prev => [...prev, { sender: 'user', text: userMsg }]);
+    setChatHistory(prev => [...prev, { sender: 'user', text: textValue }]);
     setQuickLoading(true);
     setQuickText('');
     setQuickMessage(null);
@@ -48,7 +46,7 @@ export default function Layout({ children }) {
       const res = await fetch('/api/financials/quick-add', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: userMsg, context: quickContext }),
+        body: JSON.stringify({ text: textValue, context: quickContext }),
       });
       const resData = await res.json();
       if (!res.ok) throw new Error(resData.error || 'Erreur lors du traitement par l\'IA.');
@@ -58,6 +56,7 @@ export default function Layout({ children }) {
         setChatHistory(prev => [...prev, {
           sender: 'ai',
           text: resData.prompt,
+          options: resData.options || [],
           partial: resData.context.partialTransaction
         }]);
       } else {
@@ -73,6 +72,16 @@ export default function Layout({ children }) {
     } finally {
       setQuickLoading(false);
     }
+  };
+
+  const handleQuickAdd = async (e) => {
+    e.preventDefault();
+    if (!quickText.trim()) return;
+    await submitQuickText(quickText);
+  };
+
+  const triggerOptionClick = async (opt) => {
+    await submitQuickText(opt);
   };
 
   const handleResetQuickAdd = () => {
@@ -359,6 +368,22 @@ export default function Layout({ children }) {
                       }`}>
                         {turn.text}
                       </div>
+
+                      {/* If turn has choices and it's the latest message, show clickable buttons! */}
+                      {turn.options && turn.options.length > 0 && i === chatHistory.length - 1 && !quickLoading && (
+                        <div className="flex flex-wrap gap-2 mt-1.5 max-w-[85%]">
+                          {turn.options.map((opt, idx) => (
+                            <button
+                              key={idx}
+                              type="button"
+                              onClick={() => triggerOptionClick(opt)}
+                              className="px-3.5 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 dark:bg-indigo-950/50 dark:hover:bg-indigo-900/40 dark:text-indigo-300 rounded-xl text-[11px] font-bold transition-all shadow-sm border border-indigo-100/50 dark:border-indigo-900/30 active:scale-95"
+                            >
+                              {opt}
+                            </button>
+                          ))}
+                        </div>
+                      )}
 
                       {/* If turn is AI and has partially extracted transaction, display it beautifully! */}
                       {turn.partial && (

@@ -250,6 +250,7 @@ router.post('/quick-add', authenticate, isAdmin, async (req, res) => {
         success: true,
         status: 'incomplete',
         prompt: result.prompt,
+        options: result.options || [],
         context: {
           originalInput: context ? context.originalInput : text,
           partialTransaction: result.transaction,
