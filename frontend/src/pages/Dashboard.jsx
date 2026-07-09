@@ -7,12 +7,13 @@ import {
 } from 'recharts';
 import {
   TrendingUp, TrendingDown, Landmark, Sparkles, FileOutput, Calendar, RefreshCcw, AlertOctagon, Building2, Receipt,
-  Percent, Award, Lightbulb, Coins
+  Percent, Award, Lightbulb, Coins, Plus, X
 } from 'lucide-react';
 import ReceiptScanner from '../components/ReceiptScanner.jsx';
 import ExportModal from '../components/ExportModal.jsx';
 
 const CHARGE_CATEGORIES = ['fuel_purchase', 'salary', 'water_electricity', 'cleaning_products', 'rent', 'maintenance', 'other'];
+const REVENUE_CATEGORIES = ['fuel_sales', 'shop_sales', 'services', 'other'];
 
 export default function Dashboard() {
   const { t, catLabel } = useLanguage();
@@ -26,6 +27,63 @@ export default function Dashboard() {
 
   const [scannerOpen, setScannerOpen] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
+
+  // New state variables for direct manual entry from Home Page (Dashboard)
+  const [modalOpen, setModalOpen] = useState(false);
+  const [activeType, setActiveType] = useState('charges'); // 'charges' or 'revenue'
+  const [amount, setAmount] = useState('');
+  const [category, setCategory] = useState('');
+  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [description, setDescription] = useState('');
+  const [formVendorId, setFormVendorId] = useState('');
+  const [vendors, setVendors] = useState([]);
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    async function fetchVendors() {
+      try {
+        const res = await fetch('/api/financials/vendors');
+        if (res.ok) setVendors(await res.json());
+      } catch (err) {
+        console.error('Failed to fetch vendors:', err);
+      }
+    }
+    fetchVendors();
+  }, []);
+
+  const handleSubmitForm = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+    const endpoint = activeType === 'charges' ? '/api/financials/charges' : '/api/financials/revenue';
+    const bodyData = {
+      amount: parseFloat(amount),
+      category,
+      date: new Date(date),
+      description,
+      vendorId: activeType === 'charges' ? formVendorId : undefined
+    };
+
+    try {
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(bodyData)
+      });
+      const resData = await res.json();
+      if (!res.ok) throw new Error(resData.error || 'Failed to record entry.');
+      setModalOpen(false);
+      setAmount('');
+      setCategory('');
+      setDate(new Date().toISOString().split('T')[0]);
+      setDescription('');
+      setFormVendorId('');
+      fetchDashboardData();
+    } catch (err) {
+      alert(err.message || 'Failed to record entry.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   const fetchDashboardData = async () => {
     setLoading(true);
@@ -73,11 +131,14 @@ export default function Dashboard() {
           <p className="text-sm text-slate-500 dark:text-slate-400">{t('dashboardDesc')}</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
+          <button onClick={() => { setActiveType('charges'); setCategory(''); setModalOpen(true); }} className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl shadow-md flex items-center justify-center space-x-2 transition-all">
+            <Plus className="h-4 w-4" /><span>Ajouter Opération</span>
+          </button>
+          <button onClick={() => setScannerOpen(true)} className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl shadow-md flex items-center justify-center space-x-2 transition-all">
+            <Sparkles className="h-4 w-4" /><span>{t('smartScan')}</span>
+          </button>
           <button onClick={() => window.dispatchEvent(new CustomEvent('open-quick-add'))} className="px-4 py-2.5 bg-slate-950 hover:bg-slate-900 text-white font-bold text-sm rounded-xl shadow-md flex items-center justify-center space-x-2 transition-all">
             <Sparkles className="h-4 w-4 text-indigo-400" /><span>Saisie Rapide IA</span>
-          </button>
-          <button onClick={() => setScannerOpen(true)} className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl shadow-md flex items-center justify-center space-x-2 transition-all">
-            <Sparkles className="h-4 w-4" /><span>{t('smartScan')}</span>
           </button>
           <button onClick={() => setExportOpen(true)} className="px-4 py-2.5 border border-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 bg-white dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 font-bold text-sm rounded-xl shadow-sm dark:shadow-slate-900/50 flex items-center space-x-2 transition-all">
             <FileOutput className="h-4 w-4" /><span>{t('exportData')}</span>
@@ -387,6 +448,159 @@ export default function Dashboard() {
           onClose={() => setExportOpen(false)}
           filters={{ vendorId: null, category: null, startDate: null, endDate: null, scope: 'combined' }}
         />
+      )}
+
+      {/* Dynamic Smooth Manual Entry Modal for adding charge or revenue */}
+      {modalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm transition-all duration-300">
+          <form onSubmit={handleSubmitForm} className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-slate-200 dark:border-slate-800 animate-in fade-in zoom-in-95 duration-200">
+            
+            {/* Modal Header */}
+            <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-950/45">
+              <div>
+                <h3 className="font-bold text-slate-900 dark:text-slate-50 text-md">Ajouter une opération</h3>
+                <p className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold mt-0.5">Enregistrer une dépense ou un revenu manuellement</p>
+              </div>
+              <button type="button" onClick={() => setModalOpen(false)} className="p-1.5 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg bg-slate-100 dark:bg-slate-800 transition-colors">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            {/* Tab Selector Buttons */}
+            <div className="px-6 pt-4">
+              <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
+                <button
+                  type="button"
+                  onClick={() => { setActiveType('charges'); setCategory(''); }}
+                  className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${
+                    activeType === 'charges'
+                      ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                      : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+                  }`}
+                >
+                  Dépense (Charge)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setActiveType('revenue'); setCategory(''); }}
+                  className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${
+                    activeType === 'revenue'
+                      ? 'bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 shadow-sm'
+                      : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+                  }`}
+                >
+                  Recette (Revenu)
+                </button>
+              </div>
+            </div>
+
+            {/* Form Fields */}
+            <div className="p-6 space-y-4">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">Montant (DH)</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    required
+                    placeholder="0.00"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    className="w-full border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-955 text-slate-800 dark:text-slate-200 outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">Date</label>
+                  <input
+                    type="date"
+                    required
+                    value={date}
+                    onChange={(e) => setDate(e.target.value)}
+                    className="w-full border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-955 text-slate-800 dark:text-slate-200 outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">Classification / Catégorie</label>
+                {activeType === 'charges' ? (
+                  <select
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                    required
+                    className="w-full border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-955 text-slate-800 dark:text-slate-200 outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  >
+                    <option value="">Sélectionner une catégorie</option>
+                    {CHARGE_CATEGORIES.map(c => <option key={c} value={c}>{catLabel(c)}</option>)}
+                  </select>
+                ) : (
+                  <select
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                    required
+                    className="w-full border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-955 text-slate-800 dark:text-slate-200 outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  >
+                    <option value="">Sélectionner un type de revenu</option>
+                    {REVENUE_CATEGORIES.map(c => <option key={c} value={c}>{catLabel(c)}</option>)}
+                  </select>
+                )}
+              </div>
+
+              {activeType === 'charges' && category === 'fuel_purchase' && (
+                <div>
+                  <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">Fournisseur</label>
+                  <select
+                    value={formVendorId}
+                    onChange={(e) => setFormVendorId(e.target.value)}
+                    className="w-full border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-955 text-slate-800 dark:text-slate-200 outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  >
+                    <option value="">Sélectionner un fournisseur</option>
+                    {vendors.map(v => <option key={v.id} value={v.id}>{v.name}</option>)}
+                  </select>
+                </div>
+              )}
+
+              <div>
+                <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">Description / Notes</label>
+                <textarea
+                  rows="3"
+                  placeholder="Notes facultatives sur l'opération..."
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  className="w-full border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-955 text-slate-800 dark:text-slate-200 outline-none focus:ring-2 focus:ring-indigo-500/20"
+                />
+              </div>
+            </div>
+
+            {/* Modal Actions */}
+            <div className="px-6 py-4 bg-slate-50 dark:bg-slate-950/45 border-t border-slate-100 dark:border-slate-800 flex space-x-3">
+              <button
+                type="button"
+                onClick={() => setModalOpen(false)}
+                className="flex-1 py-2.5 bg-white border border-slate-200 hover:bg-slate-100 dark:bg-slate-800 dark:border-slate-700 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 rounded-xl text-sm font-bold transition-colors"
+              >
+                Annuler
+              </button>
+              <button
+                type="submit"
+                disabled={submitting}
+                className={`flex-1 py-2.5 text-white font-bold rounded-xl text-sm shadow-md transition-all flex items-center justify-center space-x-2 ${
+                  activeType === 'charges'
+                    ? 'bg-indigo-600 hover:bg-indigo-700'
+                    : 'bg-emerald-600 hover:bg-emerald-700'
+                }`}
+              >
+                {submitting ? (
+                  <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <Plus className="h-4 w-4" />
+                )}
+                <span>Enregistrer</span>
+              </button>
+            </div>
+          </form>
+        </div>
       )}
     </div>
   );
