@@ -1,11 +1,15 @@
 import React, { useState, useRef, useMemo, useEffect } from 'react';
 import { useLanguage } from '../context/LanguageContext.jsx';
+import { useAuth } from '../context/AuthContext.jsx';
 import { Camera, UploadCloud, X, RefreshCw, Sparkles, CheckCircle2, AlertCircle, FileText, ScanLine, Edit3 } from 'lucide-react';
 
 const SCAN_CATEGORIES = ['fuel_purchase', 'salary', 'water_electricity', 'cleaning_products', 'rent', 'maintenance', 'other'];
 
 export default function ReceiptScanner({ onClose, onScanComplete }) {
   const { t, catLabel } = useLanguage();
+  const { user } = useAuth();
+  const isPompist = user?.role === 'pompist';
+
   const [mode, setMode] = useState('scan');
   const [file, setFile] = useState(null);
   const [useCamera, setUseCamera] = useState(false);
@@ -206,6 +210,16 @@ export default function ReceiptScanner({ onClose, onScanComplete }) {
             <X className="h-5 w-5" />
           </button>
         </div>
+
+        {/* Pompist approval reminder warning banner */}
+        {isPompist && (
+          <div className="mx-6 mt-4 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 text-amber-955 dark:text-amber-200 rounded-xl flex items-center space-x-2 shrink-0">
+            <AlertCircle className="h-4 w-4 text-amber-500 shrink-0" />
+            <span className="text-xs font-bold leading-relaxed">
+              Rappel : Tout reçu numérisé nécessite l'approbation de l'administrateur pour être validé.
+            </span>
+          </div>
+        )}
 
         {/* Mode Tabs (hidden during verify) */}
         {!verifyMode && !scanResult && (

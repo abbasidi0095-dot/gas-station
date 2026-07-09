@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
-import { DollarSign, Landmark, Plus, Trash2, Edit3, X, Filter, RefreshCw, FileOutput, FileText } from 'lucide-react';
+import { DollarSign, Landmark, Plus, Trash2, Edit3, X, Filter, RefreshCw, FileOutput, FileText, Sparkles } from 'lucide-react';
 import ExportModal from '../components/ExportModal.jsx';
+import ReceiptScanner from '../components/ReceiptScanner.jsx';
 
 const CHARGE_CATEGORIES = ['fuel_purchase', 'salary', 'water_electricity', 'cleaning_products', 'rent', 'maintenance', 'other'];
 const REVENUE_CATEGORIES = ['fuel_sales', 'shop_sales', 'services', 'other'];
@@ -26,6 +27,7 @@ export default function Financials() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [exportOpen, setExportOpen] = useState(false);
+  const [scannerOpen, setScannerOpen] = useState(false);
 
   const [amount, setAmount] = useState('');
   const [category, setCategory] = useState('');
@@ -135,6 +137,15 @@ export default function Financials() {
             >
               <FileOutput className="h-4 w-4" />
               <span>{t('exportData')}</span>
+            </button>
+          )}
+          {isPompist && (
+            <button
+              onClick={() => setScannerOpen(true)}
+              className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl shadow-md flex items-center justify-center space-x-2 transition-all"
+            >
+              <Sparkles className="h-4 w-4" />
+              <span>Numériser un reçu (IA)</span>
             </button>
           )}
           <button
@@ -382,6 +393,8 @@ export default function Financials() {
           }}
         />
       )}
+
+      {scannerOpen && <ReceiptScanner onClose={() => setScannerOpen(false)} onScanComplete={fetchFinancialData} />}
     </div>
   );
 }
