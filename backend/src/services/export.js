@@ -3,10 +3,11 @@ import PDFDocument from 'pdfkit';
 import fs from 'fs';
 import sharp from 'sharp';
 
-async function svgToPngBuffer(svgPath, size) {
+async function svgToPngBuffer(svgPath, height) {
   const svg = fs.readFileSync(svgPath);
   const buf = await sharp(svg)
-    .resize({ width: size, height: size, fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
+    .trim()
+    .resize({ height, background: { r: 0, g: 0, b: 0, alpha: 0 } })
     .png()
     .toBuffer();
   return buf;
@@ -344,8 +345,8 @@ export async function generateExcelExport({ range, startDate, endDate, revenues,
 
 export async function generatePDFExport({ range, startDate, endDate, revenues, charges, receipts, totals }) {
   const [almohitPng, afriquiaPng] = await Promise.all([
-    svgToPngBuffer('./assets/almohit-mark.svg', 40),
-    svgToPngBuffer('./assets/afriquia-logo.svg', 40),
+    svgToPngBuffer('./assets/almohit-mark.svg', 42),
+    svgToPngBuffer('./assets/afriquia-logo.svg', 42),
   ]);
 
   return new Promise((resolve, reject) => {
@@ -377,8 +378,8 @@ export async function generatePDFExport({ range, startDate, endDate, revenues, c
       const formattedEnd = new Date(endDate).toLocaleDateString();
 
       // Logo row — Al Mohit left, Afriquia right
-      doc.image(almohitPng, 50, 50, { width: 40 });
-      doc.image(afriquiaPng, 462, 50, { width: 40 });
+      doc.image(almohitPng, 50, 50, { height: 42 });
+      doc.image(afriquiaPng, 462, 50, { height: 42 });
       doc.y = 97;
 
       doc.fillColor('#1F4E78').fontSize(10).font('Helvetica-Bold').text('N HOLDING DAKHLA (AL MOHIT)', { align: 'center' });
