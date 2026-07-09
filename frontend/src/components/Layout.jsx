@@ -162,4 +162,48 @@ export default function Layout({ children }) {
       </div>
     </div>
   );
+
+  return (
+    <div className="min-h-screen flex flex-col md:flex-row bg-slate-50 dark:bg-slate-950 transition-colors">
+      <header className="md:hidden flex items-center justify-between px-4 py-3 bg-slate-900 border-b border-slate-800 text-white sticky top-0 z-30">
+        <div className="flex items-center space-x-2">
+          <AlMohitLogo className="h-7 w-7" variant="light" />
+          <span className="font-bold tracking-tight text-sm">Al Mohit</span>
+        </div>
+        <div className="flex items-center space-x-2">
+          <select
+            value={lang}
+            onChange={(e) => changeLanguage(e.target.value)}
+            className="bg-slate-800 text-white text-xs rounded-md px-2 py-1 border border-slate-700"
+          >
+            {Object.values(languages).map((l) => (
+              <option key={l.code} value={l.code}>{l.label}</option>
+            ))}
+          </select>
+          <button onClick={() => setMobileOpen(!mobileOpen)} className="p-1 rounded-md hover:bg-slate-800 focus:outline-none">
+            {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </button>
+        </div>
+      </header>
+
+      {mobileOpen && (
+        <div className="fixed inset-0 z-40 flex md:hidden bg-slate-950/50 backdrop-blur-sm">
+          <div className="w-64 max-w-xs h-full relative z-50">
+            {sidebarContent}
+          </div>
+          <div className="flex-1" onClick={() => setMobileOpen(false)} />
+        </div>
+      )}
+
+      <aside className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 z-20">
+        {sidebarContent}
+      </aside>
+
+      <main className="flex-1 md:pl-64 flex flex-col min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors">
+        <div className="p-4 md:p-8 max-w-7xl w-full mx-auto flex-1">
+          {children}
+        </div>
+      </main>
+    </div>
+  );
 }
