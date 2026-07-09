@@ -256,7 +256,7 @@ export default function SoldGas() {
                             <div className="space-y-3.5">
                               <div>
                                 <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block mb-1.5">{t('vendor')}</label>
-                                <select value={i === currentIdx ? vVendorId : ''} onChange={(e) => i === currentIdx && setVVendorId(e.target.value)} disabled={i !== currentIdx} className="w-full rounded-xl border border-slate-200 dark:border-slate-600 px-3.5 py-2.5 text-sm font-medium text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-700/80 focus:ring-2 focus:ring-emerald-500/20 dark:focus:ring-emerald-400/20 focus:border-emerald-500 dark:focus:border-emerald-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                                <select value={i === currentIdx ? vVendorId : ''} onChange={(e) => i === currentIdx && setVVendorId(e.target.value)} disabled={i !== currentIdx} className="w-full rounded-xl border border-slate-200 dark:border-slate-600 px-3.5 py-2.5 text-sm font-medium text-slate-800 dark:text-white bg-white dark:bg-slate-800 focus:ring-2 focus:ring-emerald-500/20 dark:focus:ring-emerald-400/20 focus:border-emerald-500 dark:focus:border-emerald-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
                                   <option value="">{t('unassigned')}</option>
                                   {vendors.map((v) => <option key={v.id} value={v.id}>{v.name}</option>)}
                                 </select>
@@ -264,7 +264,7 @@ export default function SoldGas() {
                               <div className="grid grid-cols-3 gap-3">
                                 <div>
                                   <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block mb-1.5">Fuel</label>
-                                  <select value={i === currentIdx ? vFuelType : ''} onChange={(e) => i === currentIdx && setVFuelType(e.target.value)} disabled={i !== currentIdx} className="w-full rounded-xl border border-slate-200 dark:border-slate-600 px-3.5 py-2.5 text-sm font-medium text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-700/80 focus:ring-2 focus:ring-emerald-500/20 dark:focus:ring-emerald-400/20 focus:border-emerald-500 dark:focus:border-emerald-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                                  <select value={i === currentIdx ? vFuelType : ''} onChange={(e) => i === currentIdx && setVFuelType(e.target.value)} disabled={i !== currentIdx} className="w-full rounded-xl border border-slate-200 dark:border-slate-600 px-3.5 py-2.5 text-sm font-medium text-slate-800 dark:text-white bg-white dark:bg-slate-800 focus:ring-2 focus:ring-emerald-500/20 dark:focus:ring-emerald-400/20 focus:border-emerald-500 dark:focus:border-emerald-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
                                     <option value="gasoil">Gasoil</option>
                                     <option value="essence">Essence</option>
                                     <option value="other">Other</option>
@@ -272,16 +272,16 @@ export default function SoldGas() {
                                 </div>
                                 <div>
                                   <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block mb-1.5">{t('verifyAmount')}</label>
-                                  <input type="number" step="0.01" min="0" value={i === currentIdx ? vAmount : ''} onChange={(e) => i === currentIdx && setVAmount(e.target.value)} disabled={i !== currentIdx} className="w-full rounded-xl border border-slate-200 dark:border-slate-600 px-3.5 py-2.5 text-sm font-medium text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-700/80 focus:ring-2 focus:ring-emerald-500/20 dark:focus:ring-emerald-400/20 focus:border-emerald-500 dark:focus:border-emerald-400 transition-all disabled:opacity-50" />
+                                  <input type="number" step="0.01" min="0" value={i === currentIdx ? vAmount : ''} onChange={(e) => i === currentIdx && setVAmount(e.target.value)} disabled={i !== currentIdx} className="w-full rounded-xl border border-slate-200 dark:border-slate-600 px-3.5 py-2.5 text-sm font-medium text-slate-800 dark:text-white bg-white dark:bg-slate-800 focus:ring-2 focus:ring-emerald-500/20 dark:focus:ring-emerald-400/20 focus:border-emerald-500 dark:focus:border-emerald-400 transition-all disabled:opacity-50" />
                                 </div>
                                 <div>
                                   <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block mb-1.5">{t('receiptDate')}</label>
-                                  <input type="date" value={i === currentIdx ? vDate : ''} onChange={(e) => i === currentIdx && setVDate(e.target.value)} disabled={i !== currentIdx} className="w-full rounded-xl border border-slate-200 dark:border-slate-600 px-3.5 py-2.5 text-sm font-medium text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-700/80 focus:ring-2 focus:ring-emerald-500/20 dark:focus:ring-emerald-400/20 focus:border-emerald-500 dark:focus:border-emerald-400 transition-all disabled:opacity-50" />
+                                  <input type="date" value={i === currentIdx ? vDate : ''} onChange={(e) => i === currentIdx && setVDate(e.target.value)} disabled={i !== currentIdx} className="w-full rounded-xl border border-slate-200 dark:border-slate-600 px-3.5 py-2.5 text-sm font-medium text-slate-800 dark:text-white bg-white dark:bg-slate-800 focus:ring-2 focus:ring-emerald-500/20 dark:focus:ring-emerald-400/20 focus:border-emerald-500 dark:focus:border-emerald-400 transition-all disabled:opacity-50" />
                                 </div>
                               </div>
                               <div>
                                 <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block mb-1.5">{t('notesRemarks')}</label>
-                                <textarea rows={2} value={i === currentIdx ? vDescription : ''} onChange={(e) => i === currentIdx && setVDescription(e.target.value)} disabled={i !== currentIdx} className="w-full rounded-xl border border-slate-200 dark:border-slate-600 px-3.5 py-2.5 text-sm font-medium text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-700/80 focus:ring-2 focus:ring-emerald-500/20 dark:focus:ring-emerald-400/20 focus:border-emerald-500 dark:focus:border-emerald-400 transition-all resize-none disabled:opacity-50" />
+                                <textarea rows={2} value={i === currentIdx ? vDescription : ''} onChange={(e) => i === currentIdx && setVDescription(e.target.value)} disabled={i !== currentIdx} className="w-full rounded-xl border border-slate-200 dark:border-slate-600 px-3.5 py-2.5 text-sm font-medium text-slate-800 dark:text-white bg-white dark:bg-slate-800 focus:ring-2 focus:ring-emerald-500/20 dark:focus:ring-emerald-400/20 focus:border-emerald-500 dark:focus:border-emerald-400 transition-all resize-none disabled:opacity-50" />
                               </div>
                             </div>
                           </div>

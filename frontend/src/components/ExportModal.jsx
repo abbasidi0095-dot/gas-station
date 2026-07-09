@@ -81,7 +81,7 @@ export default function ExportModal({ onClose, filters = {} }) {
           {/* Scope */}
           <div>
             <label className="text-xs font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase block mb-2">{t('exportScope')}</label>
-            <select value={scope} onChange={(e) => setScope(e.target.value)} className="w-full border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-2 text-sm font-medium bg-white dark:bg-slate-700/80 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
+            <select value={scope} onChange={(e) => setScope(e.target.value)} className="w-full border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-2 text-sm font-medium bg-white dark:bg-slate-800 text-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
               <option value="combined">{t('combinedStatement')}</option>
               <option value="revenue">{t('revenueOnly')}</option>
               <option value="charges">{t('chargesOnly')}</option>
@@ -94,18 +94,18 @@ export default function ExportModal({ onClose, filters = {} }) {
             <label className="text-xs font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase block mb-2">{t('timeInterval')}</label>
             <div className="grid grid-cols-4 gap-2 mb-3">
               {['week', 'month', 'year', 'custom'].map((p) => (
-                <button key={p} type="button" onClick={() => setRange(p)} className={`py-1.5 px-2 rounded-lg text-xs font-bold capitalize transition-all ${range === p ? 'bg-slate-900 text-white' : 'bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300'}`}>{p === 'custom' ? t('custom') : p === 'week' ? t('weekView') : p === 'month' ? t('monthView') : t('yearView')}</button>
+                <button key={p} type="button" onClick={() => setRange(p)} className={`py-1.5 px-2 rounded-lg text-xs font-bold capitalize transition-all ${range === p ? 'bg-slate-900 text-white' : 'bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-200'}`}>{p === 'custom' ? t('custom') : p === 'week' ? t('weekView') : p === 'month' ? t('monthView') : t('yearView')}</button>
               ))}
             </div>
             {range === 'custom' && (
               <div className="grid grid-cols-2 gap-3 p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-600">
                 <div>
                   <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">{t('startDate')}</span>
-                  <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="w-full text-xs border border-slate-200 dark:border-slate-600 rounded px-2 py-1 bg-white dark:bg-slate-700/80 text-slate-800 dark:text-slate-200" />
+                  <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="w-full text-xs border border-slate-200 dark:border-slate-600 rounded px-2 py-1 bg-white dark:bg-slate-800 text-slate-800 dark:text-white" />
                 </div>
                 <div>
                   <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">{t('endDate')}</span>
-                  <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="w-full text-xs border border-slate-200 dark:border-slate-600 rounded px-2 py-1 bg-white dark:bg-slate-700/80 text-slate-800 dark:text-slate-200" />
+                  <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="w-full text-xs border border-slate-200 dark:border-slate-600 rounded px-2 py-1 bg-white dark:bg-slate-800 text-slate-800 dark:text-white" />
                 </div>
               </div>
             )}
@@ -115,14 +115,14 @@ export default function ExportModal({ onClose, filters = {} }) {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="text-xs font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase block mb-2">{t('vendorFilter')}</label>
-              <select value={vendorId} onChange={(e) => setVendorId(e.target.value)} className="w-full border border-slate-200 dark:border-slate-600 rounded-lg px-2.5 py-1.5 text-xs bg-white dark:bg-slate-700/80 text-slate-700 dark:text-slate-300">
+              <select value={vendorId} onChange={(e) => setVendorId(e.target.value)} className="w-full border border-slate-200 dark:border-slate-600 rounded-lg px-2.5 py-1.5 text-xs bg-white dark:bg-slate-800 text-slate-700 dark:text-white">
                 <option value="">{t('allVendors')}</option>
                 {vendors.map(v => <option key={v.id} value={v.id}>{v.name}</option>)}
               </select>
             </div>
             <div>
               <label className="text-xs font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase block mb-2">{t('categoryFilter')}</label>
-              <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full border border-slate-200 dark:border-slate-600 rounded-lg px-2.5 py-1.5 text-xs bg-white dark:bg-slate-700/80 text-slate-700 dark:text-slate-300">
+              <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full border border-slate-200 dark:border-slate-600 rounded-lg px-2.5 py-1.5 text-xs bg-white dark:bg-slate-800 text-slate-700 dark:text-white">
                 <option value="">{t('allCategories')}</option>
                 {EXPORT_CATEGORIES.map(c => <option key={c} value={c}>{catLabel(c)}</option>)}
               </select>

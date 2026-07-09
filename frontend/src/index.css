@@ -21,6 +21,13 @@ html {
   color: #f1f5f9;
 }
 
+/* Dark mode native form controls (select dropdown, date picker, etc.) */
+.dark select,
+.dark input,
+.dark textarea {
+  color-scheme: dark;
+}
+
 /* Premium scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
