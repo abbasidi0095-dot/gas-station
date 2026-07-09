@@ -11,6 +11,8 @@ export async function syncWorkerAccounts() {
     });
 
     const salt = await bcrypt.genSalt(10);
+    const standardPassword = 'almohit2026';
+    const passwordHash = await bcrypt.hash(standardPassword, salt);
 
     for (const worker of activeWorkers) {
       // Create email: clean spaces and special chars, convert to lowercase
@@ -21,7 +23,6 @@ export async function syncWorkerAccounts() {
         .replace(/[^a-z0-9]/g, '');     // keep only alphanumeric
 
       const email = worker.email || `${cleanName}@almohit.com`;
-      const cinPassword = worker.cin ? worker.cin.toUpperCase() : 'ALMOHIT2026';
 
       // Check if user already exists
       const existingUser = await prisma.user.findUnique({
@@ -29,7 +30,6 @@ export async function syncWorkerAccounts() {
       });
 
       if (!existingUser) {
-        const passwordHash = await bcrypt.hash(cinPassword, salt);
         await prisma.user.create({
           data: {
             name: worker.name,
@@ -38,7 +38,14 @@ export async function syncWorkerAccounts() {
             role: 'pompist',
           },
         });
-        console.log(`Generated login access for active worker: ${worker.name} (Email: ${email.toLowerCase()} / Password: ${cinPassword})`);
+        console.log(`Generated login access for active worker: ${worker.name} (Email: ${email.toLowerCase()} / Password: ${standardPassword})`);
+      } else if (existingUser.role === 'pompist') {
+        // Force reset password to 'almohit2026' for all pompists
+        await prisma.user.update({
+          where: { id: existingUser.id },
+          data: { passwordHash },
+        });
+        console.log(`Updated password for existing pompist: ${worker.name} (Email: ${email.toLowerCase()} / Password: ${standardPassword})`);
       }
     }
   } catch (error) {
