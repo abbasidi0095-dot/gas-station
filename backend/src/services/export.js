@@ -373,9 +373,9 @@ export async function generatePDFExport({ range, startDate, endDate, revenues, c
       const formattedStart = new Date(startDate).toLocaleDateString();
       const formattedEnd = new Date(endDate).toLocaleDateString();
 
-      // Logo row
-      doc.image(almohitPng, 200, 45, { width: 40 });
-      doc.image(afriquiaPng, 262, 45, { width: 100 });
+      // Logo row — Al Mohit left, Afriquia right
+      doc.image(almohitPng, 50, 45, { width: 40 });
+      doc.image(afriquiaPng, 462, 45, { width: 100 });
       doc.y = 93;
 
       doc.fillColor('#1F4E78').fontSize(10).font('Helvetica-Bold').text('N HOLDING DAKHLA (AL MOHIT)', { align: 'center' });
