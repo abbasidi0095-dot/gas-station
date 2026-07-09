@@ -344,10 +344,7 @@ export async function generateExcelExport({ range, startDate, endDate, revenues,
 }
 
 export async function generatePDFExport({ range, startDate, endDate, revenues, charges, receipts, totals }) {
-  const [almohitPng, afriquiaPng] = await Promise.all([
-    svgToPngBuffer('./assets/almohit-mark.svg', 42),
-    svgToPngBuffer('./assets/afriquia-logo.svg', 42),
-  ]);
+  const almohitPng = await svgToPngBuffer('./assets/almohit-mark.svg', 42);
 
   return new Promise((resolve, reject) => {
     try {
@@ -377,9 +374,8 @@ export async function generatePDFExport({ range, startDate, endDate, revenues, c
       const formattedStart = new Date(startDate).toLocaleDateString();
       const formattedEnd = new Date(endDate).toLocaleDateString();
 
-      // Logo row — Al Mohit left, Afriquia right
+      // Al Mohit logo — top left
       doc.image(almohitPng, 50, 50, { height: 42 });
-      doc.image(afriquiaPng, 462, 50, { height: 42 });
       doc.y = 97;
 
       doc.fillColor('#1F4E78').fontSize(10).font('Helvetica-Bold').text('N HOLDING DAKHLA (AL MOHIT)', { align: 'center' });
