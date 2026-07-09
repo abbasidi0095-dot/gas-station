@@ -43,7 +43,7 @@ export async function generateExcelExport({ range, startDate, endDate, revenues,
   summarySheet.addRow(['Report Period:', `${formattedStart} to ${formattedEnd}`, '', 'Generated Date:', new Date().toLocaleString()]);
   summarySheet.addRow([]);
 
-  summarySheet.addRow(['Financial Metric', 'Total Value (MAD)', 'Status', 'Description']);
+  summarySheet.addRow(['Financial Metric', 'Total Value (MAD / DH)', 'Status', 'Description']);
   summarySheet.addRow(['Total Revenue', totals.totalRevenue, 'Active', 'All fuel, store, and service sales.']);
   summarySheet.addRow(['Total Expenses (Charges)', totals.totalCharges, 'Active', 'Supplier purchases, maintenance, salaries, utilities, etc.']);
   summarySheet.addRow(['Net Profit / Margin', totals.netProfit, totals.netProfit >= 0 ? 'Healthy' : 'Deficit', 'Difference between revenue and charges.']);
@@ -57,7 +57,7 @@ export async function generateExcelExport({ range, startDate, endDate, revenues,
 
   for (let r = 6; r <= 8; r++) {
     const row = summarySheet.getRow(r);
-    row.getCell(2).numFmt = '#,##0.00 "MAD"';
+    row.getCell(2).numFmt = '#,##0.00 "MAD / DH"';
     if (r === 8) {
       row.getCell(1).font = { bold: true };
       row.getCell(2).font = { bold: true, color: { argb: totals.netProfit >= 0 ? '375623' : 'C00000' } };
@@ -77,7 +77,7 @@ export async function generateExcelExport({ range, startDate, endDate, revenues,
     revSheet.views = [{ showGridLines: true }];
     revSheet.addRow(['Daily Revenue Ledger — Operation by Operation']);
     revSheet.getRow(1).font = { size: 14, bold: true };
-    revSheet.addRow(['Date', 'Vendor', 'Category', 'Amount (MAD)', 'Description']);
+    revSheet.addRow(['Date', 'Vendor', 'Category', 'Amount (MAD / DH)', 'Description']);
 
     const revHeader = revSheet.getRow(2);
     revHeader.font = { bold: true, color: { argb: 'FFFFFF' } };
@@ -114,7 +114,7 @@ export async function generateExcelExport({ range, startDate, endDate, revenues,
       const subRow = revSheet.addRow([`Daily Total — ${group.date}`, '', '', dayAmount, `(${group.records.length} operations)`]);
       subRow.font = { bold: true, italic: true };
       subRow.getCell(2).alignment = { horizontal: 'right' };
-      subRow.getCell(4).numFmt = '#,##0.00 "MAD"';
+      subRow.getCell(4).numFmt = '#,##0.00 "MAD / DH"';
       const subRowCells = subRow.eachCell((cell) => {
         cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'E8F5E9' } };
       });
@@ -124,7 +124,7 @@ export async function generateExcelExport({ range, startDate, endDate, revenues,
     // Grand total
     const grandRow = revSheet.addRow(['GRAND TOTAL REVENUE', '', '', grandTotal, `${revenues.length} total operations`]);
     grandRow.font = { bold: true, size: 12 };
-    grandRow.getCell(4).numFmt = '#,##0.00 "MAD"';
+    grandRow.getCell(4).numFmt = '#,##0.00 "MAD / DH"';
     grandRow.eachCell((cell) => {
       cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'C8E6C9' } };
       cell.border = {
@@ -149,7 +149,7 @@ export async function generateExcelExport({ range, startDate, endDate, revenues,
     expSheet.views = [{ showGridLines: true }];
     expSheet.addRow(['Charges and Expenses Ledger']);
     expSheet.getRow(1).font = { size: 14, bold: true };
-    expSheet.addRow(['Date', 'Vendor', 'Category', 'Amount (MAD)', 'Description', 'Source / Receipt']);
+    expSheet.addRow(['Date', 'Vendor', 'Category', 'Amount (MAD / DH)', 'Description', 'Source / Receipt']);
 
     const expHeader = expSheet.getRow(2);
     expHeader.font = { bold: true, color: { argb: 'FFFFFF' } };
@@ -181,7 +181,7 @@ export async function generateExcelExport({ range, startDate, endDate, revenues,
       expSheet.addRow([]);
       const sumRow = expSheet.addRow(['Total Expenses Sum', '', '', { formula: `SUM(D3:D${expLastRow})` }, '', '']);
       sumRow.font = { bold: true };
-      sumRow.getCell(4).numFmt = '#,##0.00 "MAD"';
+      sumRow.getCell(4).numFmt = '#,##0.00 "MAD / DH"';
     }
   }
 
@@ -202,7 +202,7 @@ export async function generateExcelExport({ range, startDate, endDate, revenues,
     vSheet.views = [{ showGridLines: true }];
     vSheet.addRow([`${vName} — Revenue Ledger`]);
     vSheet.getRow(1).font = { size: 14, bold: true };
-    vSheet.addRow(['Date', 'Category', 'Amount (MAD)', 'Description']);
+    vSheet.addRow(['Date', 'Category', 'Amount (MAD / DH)', 'Description']);
 
     const vHeader = vSheet.getRow(2);
     vHeader.font = { bold: true, color: { argb: 'FFFFFF' } };
@@ -237,7 +237,7 @@ export async function generateExcelExport({ range, startDate, endDate, revenues,
       vSheet.addRow([]);
       const sumRow = vSheet.addRow(['Total', '', { formula: `SUM(C3:C${vLastRow})` }, '']);
       sumRow.font = { bold: true };
-      sumRow.getCell(3).numFmt = '#,##0.00 "MAD"';
+      sumRow.getCell(3).numFmt = '#,##0.00 "MAD / DH"';
     }
   }
 
@@ -257,7 +257,7 @@ export async function generateExcelExport({ range, startDate, endDate, revenues,
     vSheet.views = [{ showGridLines: true }];
     vSheet.addRow([`${vName} — Expenses Ledger`]);
     vSheet.getRow(1).font = { size: 14, bold: true };
-    vSheet.addRow(['Date', 'Category', 'Amount (MAD)', 'Description', 'Source / Receipt']);
+    vSheet.addRow(['Date', 'Category', 'Amount (MAD / DH)', 'Description', 'Source / Receipt']);
 
     const vHeader = vSheet.getRow(2);
     vHeader.font = { bold: true, color: { argb: 'FFFFFF' } };
@@ -287,7 +287,7 @@ export async function generateExcelExport({ range, startDate, endDate, revenues,
       vSheet.addRow([]);
       const sumRow = vSheet.addRow(['Total', '', { formula: `SUM(C3:C${vLastRow})` }, '', '']);
       sumRow.font = { bold: true };
-      sumRow.getCell(3).numFmt = '#,##0.00 "MAD"';
+      sumRow.getCell(3).numFmt = '#,##0.00 "MAD / DH"';
     }
   }
 
@@ -356,11 +356,11 @@ export function generatePDFExport({ range, startDate, endDate, revenues, charges
       const isProfitable = totals.netProfit >= 0;
       const metricY = doc.y + 2;
       doc.text(`Total Revenue:`, 50, metricY);
-      doc.text(`${totals.totalRevenue.toFixed(2)} MAD`, 230, metricY);
+      doc.text(`${totals.totalRevenue.toFixed(2)} MAD / DH`, 230, metricY);
       doc.text(`Total Expenses:`, 350, metricY);
-      doc.text(`${totals.totalCharges.toFixed(2)} MAD`, 480, metricY);
+      doc.text(`${totals.totalCharges.toFixed(2)} MAD / DH`, 480, metricY);
       doc.text(`Net Profit:`, 50, metricY + 18);
-      doc.fillColor(isProfitable ? '#375623' : '#C00000').text(`${totals.netProfit.toFixed(2)} MAD`, 230, metricY + 18);
+      doc.fillColor(isProfitable ? '#375623' : '#C00000').text(`${totals.netProfit.toFixed(2)} MAD / DH`, 230, metricY + 18);
       doc.fillColor('#262626').text(`${revenues.length} rev. ops  ·  ${charges.length} exp. entries`, 350, metricY + 18, { fontSize: 9 });
       doc.moveTo(50, metricY + 42).lineTo(562, metricY + 42).strokeColor('#CCC').lineWidth(0.5).stroke();
       doc.y = metricY + 50;
@@ -406,7 +406,7 @@ export function generatePDFExport({ range, startDate, endDate, revenues, charges
           doc.rect(50, y, 512, 18).fillColor('#E8F5E9').fill();
           doc.fillColor('#1B5E20').fontSize(8).font('Helvetica-Bold');
           doc.text(`Daily Total — ${group.date}`, 55, y + 5);
-          doc.text(`${dayTotal.toFixed(2)} MAD`, 430, y + 5, { width: 120, align: 'right' });
+          doc.text(`${dayTotal.toFixed(2)} MAD / DH`, 430, y + 5, { width: 120, align: 'right' });
           y += 20;
         }
 
@@ -416,7 +416,7 @@ export function generatePDFExport({ range, startDate, endDate, revenues, charges
         doc.rect(50, y, 512, 20).fillColor('#1B5E20').fill();
         doc.fillColor('#FFFFFF').fontSize(9).font('Helvetica-Bold');
         doc.text(`GRAND TOTAL — ${revenues.length} operations`, 55, y + 6);
-        doc.text(`${grandTotal.toFixed(2)} MAD`, 430, y + 6, { width: 120, align: 'right' });
+        doc.text(`${grandTotal.toFixed(2)} MAD / DH`, 430, y + 6, { width: 120, align: 'right' });
         doc.y = y + 30;
         doc.fillColor('#262626');
         doc.moveDown(1);
@@ -435,7 +435,7 @@ export function generatePDFExport({ range, startDate, endDate, revenues, charges
         doc.text('Date', 55, y + 6);
         doc.text('Vendor', 150, y + 6);
         doc.text('Category', 280, y + 6);
-        doc.text('Amount (MAD)', 460, y + 6, { align: 'right' });
+        doc.text('Amount (MAD / DH)', 460, y + 6, { align: 'right' });
 
         y += 22;
 
@@ -457,7 +457,7 @@ export function generatePDFExport({ range, startDate, endDate, revenues, charges
         doc.rect(50, y, 512, 20).fillColor('#C00000').fill();
         doc.fillColor('#FFFFFF').fontSize(9).font('Helvetica-Bold');
         doc.text(`TOTAL EXPENSES — ${charges.length} entries`, 55, y + 6);
-        doc.text(`${expTotal.toFixed(2)} MAD`, 440, y + 6, { width: 120, align: 'right' });
+        doc.text(`${expTotal.toFixed(2)} MAD / DH`, 440, y + 6, { width: 120, align: 'right' });
         doc.y = y + 30;
       }
 
@@ -517,7 +517,7 @@ export function generatePDFExport({ range, startDate, endDate, revenues, charges
             doc.rect(50, y, 512, 18).fillColor(subBg).fill();
             doc.fillColor(vName === 'Al Mohit' ? '#B71C1C' : '#1A237E').fontSize(8).font('Helvetica-Bold');
             doc.text(`Daily Total — ${group.date}`, 55, y + 5);
-            doc.text(`${dayTotal.toFixed(2)} MAD`, 430, y + 5, { width: 120, align: 'right' });
+            doc.text(`${dayTotal.toFixed(2)} MAD / DH`, 430, y + 5, { width: 120, align: 'right' });
             y += 20;
           }
 
@@ -527,7 +527,7 @@ export function generatePDFExport({ range, startDate, endDate, revenues, charges
           doc.rect(50, y, 512, 20).fillColor(totalBg).fill();
           doc.fillColor('#FFFFFF').fontSize(9).font('Helvetica-Bold');
           doc.text(`${vName} TOTAL — ${vRevs.length} operations`, 55, y + 6);
-          doc.text(`${vTotal.toFixed(2)} MAD`, 430, y + 6, { width: 120, align: 'right' });
+          doc.text(`${vTotal.toFixed(2)} MAD / DH`, 430, y + 6, { width: 120, align: 'right' });
           doc.y = y + 30;
           doc.fillColor('#262626');
           doc.moveDown(1);

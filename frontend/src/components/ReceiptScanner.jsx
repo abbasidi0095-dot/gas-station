@@ -336,7 +336,7 @@ export default function ReceiptScanner({ onClose, onScanComplete }) {
                         </div>
                         <div>
                           <span className="text-slate-400 block text-xs">{t('amount')}</span>
-                          <span className="font-bold text-slate-800">{scanResult.receipt.amount != null ? `${scanResult.receipt.amount.toFixed(2)} MAD` : 'N/A'}</span>
+                          <span className="font-bold text-slate-800">{scanResult.receipt.amount != null ? `${scanResult.receipt.amount.toFixed(2)} MAD / DH` : 'N/A'}</span>
                         </div>
                       </div>
                     </div>

@@ -87,7 +87,7 @@ export default function ReviewQueue() {
                       <span className="text-[10px] font-bold text-indigo-600 bg-indigo-100 px-2 py-0.5 rounded">{(((rc.confidenceScore ?? 0) * 100).toFixed(0))}{t('matchPct')}</span>
                     </div>
                     <p className="text-xs text-slate-400 mt-1">{t('uploaded')}: {new Date(rc.scannedAt).toLocaleString()}</p>
-                    <p className="text-sm font-bold text-slate-800 mt-2">{rc.amount != null ? `${rc.amount.toFixed(2)} ${rc.currency || 'MAD'}` : t('amountNA')}</p>
+                    <p className="text-sm font-bold text-slate-800 mt-2">{rc.amount != null ? `${rc.amount.toFixed(2)} ${rc.currency || 'MAD / DH'}` : t('amountNA')}</p>
                   </div>
                 );
               })}

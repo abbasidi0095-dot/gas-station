@@ -160,7 +160,7 @@ export default function Workers() {
             <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
               <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
                 <div className="flex items-center space-x-3"><Wallet className="h-5 w-5 text-slate-900" /><h3 className="font-bold text-slate-900">{t('payroll')} ({payments.length})</h3></div>
-                <span className="text-xs font-bold text-emerald-600">{totalPaid.toLocaleString(undefined, { minimumFractionDigits: 2 })} MAD</span>
+                <span className="text-xs font-bold text-emerald-600">{totalPaid.toLocaleString(undefined, { minimumFractionDigits: 2 })} MAD / DH</span>
               </div>
               <div className="divide-y divide-slate-100 max-h-[500px] overflow-y-auto">
                 {payments.length === 0 ? (
@@ -170,7 +170,7 @@ export default function Workers() {
                     <div key={p.id} className="p-4 hover:bg-slate-50 flex items-start justify-between">
                       <div className="space-y-1">
                         <h4 className="font-bold text-sm text-slate-900">{p.worker?.name}</h4>
-                        <p className="text-xs font-semibold text-slate-500">{new Date(p.date).toLocaleDateString()} &bull; {(p.amount || 0).toFixed(2)} MAD</p>
+                        <p className="text-xs font-semibold text-slate-500">{new Date(p.date).toLocaleDateString()} &bull; {(p.amount || 0).toFixed(2)} MAD / DH</p>
                         {p.description && <p className="text-xs text-slate-400 italic">"{p.description}"</p>}
                       </div>
                       <button onClick={() => handleDeletePayment(p.id)} className="p-1 hover:bg-red-50 text-red-500 rounded transition-all"><Trash2 className="h-4 w-4" /></button>

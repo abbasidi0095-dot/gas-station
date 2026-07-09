@@ -156,7 +156,7 @@ export default function Financials() {
         </div>
         <div className="text-right">
           <span className={`text-3xl font-black ${activeTab === 'charges' ? 'text-red-400' : 'text-emerald-400'}`}>
-            {ledgerSum.toLocaleString(undefined, { minimumFractionDigits: 2 })} <span className="text-xs font-semibold">MAD</span>
+            {ledgerSum.toLocaleString(undefined, { minimumFractionDigits: 2 })} <span className="text-xs font-semibold">MAD / DH</span>
           </span>
         </div>
       </div>

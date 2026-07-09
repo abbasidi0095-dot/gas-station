@@ -38,7 +38,7 @@ function extractFieldsFromRaw(text) {
   const mNum = s => { const x = s.exec(text); return x ? parseFloat(x[1]) : undefined; };
   r.vendor = m(/"vendor"\s*:\s*"([^"]*)"/i) || 'unknown';
   r.amount = mNum(/"amount"\s*:\s*([0-9]+\.?[0-9]*)/i) !== undefined ? mNum(/"amount"\s*:\s*([0-9]+\.?[0-9]*)/i) : null;
-  r.currency = m(/"currency"\s*:\s*"([^"]*)"/i) || 'MAD';
+  r.currency = m(/"currency"\s*:\s*"([^"]*)"/i) || 'MAD / DH';
   r.fuelType = m(/"fuelType"\s*:\s*"([^"]*)"/i) || 'unknown';
   r.date = m(/"date"\s*:\s*"([^"]*)"/i) || new Date().toISOString().split('T')[0];
   r.confidence = mNum(/"confidence"\s*:\s*([0-9]+\.?[0-9]*)/i) !== undefined ? mNum(/"confidence"\s*:\s*([0-9]+\.?[0-9]*)/i) : 0.5;
@@ -95,14 +95,14 @@ For EACH receipt, extract the following fields:
    - "Afriquia" (may appear as Afriquia / Afriqia / أفريقيا)
    - If neither is recognizable, return "unknown".
 2. "amount": The final TOTAL amount to pay as a decimal number (e.g. 1234.56). Pick the grand total, not a subtotal.
-3. "currency": Usually "MAD" or "DH". Default to "MAD" if unclear.
+3. "currency": Usually "MAD" or "DH". Default to "MAD / DH" if unclear.
 4. "fuelType": The fuel type dispensed — look for keywords like "Gasoil", "Diesel", "Gazole", "Essence", "Gasoline", "Sans Plomb", "Super". Return "gasoil" for gasoil/diesel/gazole, "essence" for essence/gasoline/sans plomb/super. If unclear return "unknown".
 5. "date": The receipt date in YYYY-MM-DD format. CRITICAL: You MUST find the actual printed date on the receipt. Look for date stamps, headers. If the date uses DD/MM/YYYY, convert to YYYY-MM-DD. DO NOT use today's date.
 6. "confidence": A float from 0.0 to 1.0 indicating how confident you are in the extraction (image quality, readability).
 7. "extractedRawText": A clean full transcript of all readable text on that specific receipt.
 
 Return ONLY raw JSON — a JSON ARRAY (no markdown fences, no explanation):
-[{"vendor":"Al Mohit"|"Afriquia"|"unknown","amount":number,"currency":"MAD","fuelType":"gasoil"|"essence"|"unknown","date":"YYYY-MM-DD","confidence":number,"extractedRawText":"transcript"},...]
+[{"vendor":"Al Mohit"|"Afriquia"|"unknown","amount":number,"currency":"MAD / DH","fuelType":"gasoil"|"essence"|"unknown","date":"YYYY-MM-DD","confidence":number,"extractedRawText":"transcript"},...]
 
 If there is only ONE receipt, still return it as a single-element array: [{"vendor":...}].`;
 

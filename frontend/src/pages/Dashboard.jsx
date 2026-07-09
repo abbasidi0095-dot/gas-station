@@ -123,7 +123,7 @@ export default function Dashboard() {
             <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-start justify-between">
               <div className="space-y-2">
                 <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">{t('totalRevenue')}</span>
-                <h3 className="text-3xl font-black text-slate-900">{data.summary.totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2 })} <span className="text-xs font-semibold text-slate-400">MAD</span></h3>
+                <h3 className="text-3xl font-black text-slate-900">{data.summary.totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2 })} <span className="text-xs font-semibold text-slate-400">MAD / DH</span></h3>
                 <span className="inline-flex items-center text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded"><TrendingUp className="h-3 w-3 mr-1" /><span>{t('receiptsSales')}</span></span>
               </div>
               <div className="p-3 bg-emerald-50 rounded-xl text-emerald-600"><TrendingUp className="h-6 w-6" /></div>
@@ -131,7 +131,7 @@ export default function Dashboard() {
             <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-start justify-between">
               <div className="space-y-2">
                 <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">{t('totalSpend')}</span>
-                <h3 className="text-3xl font-black text-slate-900">{data.summary.totalCharges.toLocaleString(undefined, { minimumFractionDigits: 2 })} <span className="text-xs font-semibold text-slate-400">MAD</span></h3>
+                <h3 className="text-3xl font-black text-slate-900">{data.summary.totalCharges.toLocaleString(undefined, { minimumFractionDigits: 2 })} <span className="text-xs font-semibold text-slate-400">MAD / DH</span></h3>
                 <span className="inline-flex items-center text-xs font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded"><TrendingDown className="h-3 w-3 mr-1" /><span>{t('chargesLogistics')}</span></span>
               </div>
               <div className="p-3 bg-red-50 rounded-xl text-red-600"><TrendingDown className="h-6 w-6" /></div>
@@ -139,7 +139,7 @@ export default function Dashboard() {
             <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-start justify-between">
               <div className="space-y-2">
                 <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">{t('netProfit')}</span>
-                <h3 className={`text-3xl font-black ${data.summary.netProfit >= 0 ? 'text-slate-900' : 'text-red-700'}`}>{data.summary.netProfit.toLocaleString(undefined, { minimumFractionDigits: 2 })} <span className="text-xs font-semibold text-slate-400">MAD</span></h3>
+                <h3 className={`text-3xl font-black ${data.summary.netProfit >= 0 ? 'text-slate-900' : 'text-red-700'}`}>{data.summary.netProfit.toLocaleString(undefined, { minimumFractionDigits: 2 })} <span className="text-xs font-semibold text-slate-400">MAD / DH</span></h3>
                 <span className={`inline-flex items-center text-xs font-bold px-2 py-0.5 rounded ${data.summary.netProfit >= 0 ? 'bg-indigo-50 text-indigo-700' : 'bg-red-50 text-red-700'}`}><Landmark className="h-3 w-3 mr-1" /><span>{data.summary.netProfit >= 0 ? t('surplus') : t('deficit')}</span></span>
               </div>
               <div className={`p-3 rounded-xl ${data.summary.netProfit >= 0 ? 'bg-indigo-50 text-indigo-600' : 'bg-red-50 text-red-600'}`}><Landmark className="h-6 w-6" /></div>
@@ -191,7 +191,7 @@ export default function Dashboard() {
                       <div key={item.name} className="space-y-1.5">
                         <div className="flex items-center justify-between text-sm">
                           <span className="font-semibold text-slate-700">{item.name}</span>
-                          <span className="font-bold text-slate-900">{item.value.toLocaleString(undefined, { minimumFractionDigits: 0 })} MAD</span>
+                          <span className="font-bold text-slate-900">{item.value.toLocaleString(undefined, { minimumFractionDigits: 0 })} MAD / DH</span>
                         </div>
                         <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
                           <div className="h-full rounded-full" style={{ width: `${pct}%`, backgroundColor: COLORS[index % COLORS.length] }} />
@@ -221,7 +221,7 @@ export default function Dashboard() {
                       {data.revenueCategories.map((item, i) => (
                         <div key={item.name} className="flex items-center justify-between font-medium">
                           <div className="flex items-center space-x-2"><div className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: COLORS[i % COLORS.length] }} /><span className="text-slate-600 capitalize">{catLabel(item.name)}</span></div>
-                          <span className="font-bold text-slate-800">{item.value.toLocaleString()} MAD</span>
+                          <span className="font-bold text-slate-800">{item.value.toLocaleString()} MAD / DH</span>
                         </div>
                       ))}
                     </div>
@@ -247,7 +247,7 @@ export default function Dashboard() {
                       {data.expenseCategories.map((item, i) => (
                         <div key={item.name} className="flex items-center justify-between font-medium">
                           <div className="flex items-center space-x-2"><div className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: COLORS[i % COLORS.length] }} /><span className="text-slate-600">{catLabel(item.name)}</span></div>
-                          <span className="font-bold text-slate-800">{item.value.toLocaleString()} MAD</span>
+                          <span className="font-bold text-slate-800">{item.value.toLocaleString()} MAD / DH</span>
                         </div>
                       ))}
                     </div>
