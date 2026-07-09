@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useLanguage } from '../context/LanguageContext.jsx';
-import { UploadCloud, X, RefreshCw, Fuel, Check, Ban, AlertCircle, ChevronLeft, ChevronRight, ImageIcon, ScanLine } from 'lucide-react';
+import { UploadCloud, X, RefreshCw, Fuel, Check, Ban, AlertCircle, ChevronLeft, ChevronRight, ImageIcon, ScanLine, Plus } from 'lucide-react';
 import { Dropzone } from '@/components/ui/dropzone';
 import {
   Carousel,
@@ -29,6 +29,15 @@ export default function SoldGas() {
   const [submitting, setSubmitting] = useState(false);
   const thumbRef = useRef(null);
 
+  // Manual entry modal state for Sold Gas
+  const [manualModalOpen, setManualModalOpen] = useState(false);
+  const [mAmount, setMAmount] = useState('');
+  const [mDate, setMDate] = useState(new Date().toISOString().split('T')[0]);
+  const [mFuelType, setMFuelType] = useState('gasoil');
+  const [mVendorId, setMVendorId] = useState('');
+  const [mDescription, setMDescription] = useState('');
+  const [manualSubmitting, setManualSubmitting] = useState(false);
+
   const fetchQueue = useCallback(async () => {
     setLoading(true);
     try {
@@ -45,6 +54,37 @@ export default function SoldGas() {
       }
     } catch (err) { console.error(err); } finally { setLoading(false); }
   }, []);
+
+  const handleSaveManual = async (e) => {
+    e.preventDefault();
+    setManualSubmitting(true);
+    try {
+      const res = await fetch('/api/receipts/sold-gas/manual', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          vendorId: mVendorId || null,
+          amount: parseFloat(mAmount),
+          date: mDate,
+          fuelType: mFuelType,
+          description: mDescription || undefined,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Erreur lors de la saisie.');
+      setManualModalOpen(false);
+      setMAmount('');
+      setMDate(new Date().toISOString().split('T')[0]);
+      setMFuelType('gasoil');
+      setMVendorId('');
+      setMDescription('');
+      fetchQueue();
+    } catch (err) {
+      alert(err.message || 'Erreur lors de l\'enregistrement.');
+    } finally {
+      setManualSubmitting(false);
+    }
+  };
 
   useEffect(() => { fetchQueue(); }, [fetchQueue]);
 
@@ -122,13 +162,22 @@ export default function SoldGas() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h2 className="text-2xl font-black text-slate-900 dark:text-slate-50 tracking-tight flex items-center space-x-2">
             <Fuel className="h-7 w-7 text-emerald-600" />
             <span>{t('soldGas')}</span>
           </h2>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{t('soldGasDesc')}</p>
+        </div>
+        <div>
+          <button
+            onClick={() => setManualModalOpen(true)}
+            className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl shadow-md flex items-center justify-center space-x-2 transition-all"
+          >
+            <Plus className="h-4 w-4" />
+            <span>Saisie Manuelle</span>
+          </button>
         </div>
       </div>
 
@@ -339,6 +388,113 @@ export default function SoldGas() {
               </div>
             </div>
           )}
+        </div>
+      )}
+      {/* Manual Sold Gas Entry Modal */}
+      {manualModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm transition-all duration-300">
+          <form onSubmit={handleSaveManual} className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-slate-200 dark:border-slate-800 animate-in fade-in zoom-in-95 duration-200">
+            
+            {/* Modal Header */}
+            <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-950/45">
+              <div>
+                <h3 className="font-bold text-slate-900 dark:text-slate-50 text-md">Saisie Manuelle - Vente de Carburant</h3>
+                <p className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold mt-0.5">Enregistrer un bon de vente de carburant manuellement</p>
+              </div>
+              <button type="button" onClick={() => setManualModalOpen(false)} className="p-1.5 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg bg-slate-100 dark:bg-slate-800 transition-colors">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            {/* Form Fields */}
+            <div className="p-6 space-y-4">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">Montant (DH)</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    required
+                    placeholder="0.00"
+                    value={mAmount}
+                    onChange={(e) => setMAmount(e.target.value)}
+                    className="w-full border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500/20"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">Date</label>
+                  <input
+                    type="date"
+                    required
+                    value={mDate}
+                    onChange={(e) => setMDate(e.target.value)}
+                    className="w-full border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500/20"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">Type de Carburant</label>
+                  <select
+                    value={mFuelType}
+                    onChange={(e) => setMFuelType(e.target.value)}
+                    required
+                    className="w-full border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-955 text-slate-800 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500/20"
+                  >
+                    <option value="gasoil">Gasoil (Diesel)</option>
+                    <option value="essence">Essence (Sans Plomb)</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">Client / Fournisseur</label>
+                  <select
+                    value={mVendorId}
+                    onChange={(e) => setMVendorId(e.target.value)}
+                    className="w-full border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-955 text-slate-800 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500/20"
+                  >
+                    <option value="">Sélectionner un client</option>
+                    {vendors.map(v => <option key={v.id} value={v.id}>{v.name}</option>)}
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">Description / Notes</label>
+                <textarea
+                  rows="3"
+                  placeholder="Notes facultatives sur la vente..."
+                  value={mDescription}
+                  onChange={(e) => setMDescription(e.target.value)}
+                  className="w-full border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-955 text-slate-800 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500/20"
+                />
+              </div>
+            </div>
+
+            {/* Modal Actions */}
+            <div className="px-6 py-4 bg-slate-50 dark:bg-slate-950/45 border-t border-slate-100 dark:border-slate-800 flex space-x-3">
+              <button
+                type="button"
+                onClick={() => setManualModalOpen(false)}
+                className="flex-1 py-2.5 bg-white border border-slate-200 hover:bg-slate-100 dark:bg-slate-800 dark:border-slate-700 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 rounded-xl text-sm font-bold transition-colors"
+              >
+                Annuler
+              </button>
+              <button
+                type="submit"
+                disabled={manualSubmitting}
+                className="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-sm shadow-md transition-all flex items-center justify-center space-x-2"
+              >
+                {manualSubmitting ? (
+                  <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <Plus className="h-4 w-4" />
+                )}
+                <span>Enregistrer</span>
+              </button>
+            </div>
+          </form>
         </div>
       )}
     </div>

@@ -420,4 +420,58 @@ router.get('/:id', authenticate, isAdmin, async (req, res) => {
   }
 });
 
+// POST /api/receipts/sold-gas/manual
+router.post('/sold-gas/manual', authenticate, isAdmin, async (req, res) => {
+  const { vendorId, amount, date, fuelType, description } = req.body;
+
+  if (!amount || !date) {
+    return res.status(400).json({ error: 'Montant et Date sont obligatoires.' });
+  }
+
+  try {
+    const result = await prisma.$transaction(async (tx) => {
+      // 1. Create a dummy receipt representing the manual entry of a fuel sales voucher
+      const receipt = await tx.receipt.create({
+        data: {
+          imageUrl: '/uploads/manual-entry.png',
+          vendorId: vendorId || null,
+          amount: parseFloat(amount),
+          currency: 'MAD',
+          extractedRawText: description || 'Saisie manuelle',
+          confidenceScore: 1.0,
+          status: 'confirmed',
+          purpose: 'revenue',
+          scannedBy: req.user.id,
+          fuelType: fuelType || null,
+          date: date,
+        },
+      });
+
+      // 2. Create the associated Revenue record
+      const revenue = await tx.revenue.create({
+        data: {
+          amount: parseFloat(amount),
+          category: 'fuel_sales',
+          fuelType: fuelType || null,
+          date: new Date(date),
+          description: description || 'Vente de carburant (Saisie manuelle)',
+          createdBy: req.user.id,
+          vendorId: vendorId || null,
+          receiptId: receipt.id,
+        },
+      });
+
+      return { receipt, revenue };
+    });
+
+    return res.status(201).json({
+      message: 'Bon de vente de carburant enregistré manuellement avec succès.',
+      data: result,
+    });
+  } catch (error) {
+    console.error('Manual sold-gas entry error:', error);
+    return res.status(500).json({ error: 'Failed to record manual fuel sales entry.' });
+  }
+});
+
 export default router;
