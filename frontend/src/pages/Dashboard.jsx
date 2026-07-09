@@ -72,14 +72,14 @@ export default function Dashboard() {
           <h2 className="text-2xl font-black text-slate-900 dark:text-slate-50 tracking-tight">{t('execDashboard')}</h2>
           <p className="text-sm text-slate-500 dark:text-slate-400">{t('dashboardDesc')}</p>
         </div>
-        <div className="flex items-center space-x-2.5">
-          <button onClick={() => window.dispatchEvent(new CustomEvent('open-quick-add'))} className="px-4 py-2 bg-slate-950 hover:bg-slate-900 text-white font-bold text-sm rounded-xl shadow-md flex items-center space-x-2 transition-all">
+        <div className="flex flex-wrap items-center gap-2">
+          <button onClick={() => window.dispatchEvent(new CustomEvent('open-quick-add'))} className="px-4 py-2.5 bg-slate-950 hover:bg-slate-900 text-white font-bold text-sm rounded-xl shadow-md flex items-center justify-center space-x-2 transition-all">
             <Sparkles className="h-4 w-4 text-indigo-400" /><span>Saisie Rapide IA</span>
           </button>
-          <button onClick={() => setScannerOpen(true)} className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl shadow-md flex items-center space-x-2 transition-all">
+          <button onClick={() => setScannerOpen(true)} className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl shadow-md flex items-center justify-center space-x-2 transition-all">
             <Sparkles className="h-4 w-4" /><span>{t('smartScan')}</span>
           </button>
-          <button onClick={() => setExportOpen(true)} className="px-4 py-2 border border-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 bg-white dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 font-bold text-sm rounded-xl shadow-sm dark:shadow-slate-900/50 flex items-center space-x-2 transition-all">
+          <button onClick={() => setExportOpen(true)} className="px-4 py-2.5 border border-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 bg-white dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 font-bold text-sm rounded-xl shadow-sm dark:shadow-slate-900/50 flex items-center space-x-2 transition-all">
             <FileOutput className="h-4 w-4" /><span>{t('exportData')}</span>
           </button>
         </div>

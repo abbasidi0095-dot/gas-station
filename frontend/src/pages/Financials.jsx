@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../context/LanguageContext.jsx';
-import { DollarSign, Landmark, Plus, Trash2, Edit3, X, Filter, RefreshCw, FileOutput } from 'lucide-react';
+import { DollarSign, Landmark, Plus, Trash2, Edit3, X, Filter, RefreshCw, FileOutput, FileText } from 'lucide-react';
 import ExportModal from '../components/ExportModal.jsx';
 
 const CHARGE_CATEGORIES = ['fuel_purchase', 'salary', 'water_electricity', 'cleaning_products', 'rent', 'maintenance', 'other'];
@@ -60,6 +60,14 @@ export default function Financials() {
 
   useEffect(() => { fetchFinancialData(); }, [activeTab, vendorFilter, categoryFilter, startDate, endDate]);
 
+  useEffect(() => {
+    const handleScanComplete = () => {
+      fetchFinancialData();
+    };
+    window.addEventListener('scan-complete', handleScanComplete);
+    return () => window.removeEventListener('scan-complete', handleScanComplete);
+  }, [activeTab, vendorFilter, categoryFilter, startDate, endDate]);
+
   const handleClearFilters = () => {
     setVendorFilter(''); setCategoryFilter(''); setStartDate(''); setEndDate('');
   };
@@ -112,17 +120,17 @@ export default function Financials() {
           <h2 className="text-2xl font-black text-slate-900 tracking-tight">{t('financialLedger')}</h2>
           <p className="text-sm text-slate-500 dark:text-slate-400">{t('financialsDesc')}</p>
         </div>
-        <div className="flex items-center space-x-2">
+        <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={() => setExportOpen(true)}
-            className="px-4 py-2 border border-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 bg-white dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 font-bold text-xs rounded-xl shadow-sm dark:shadow-slate-900/50 flex items-center space-x-2 transition-all"
+            className="px-4 py-2.5 border border-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 bg-white dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 font-bold text-sm rounded-xl shadow-sm dark:shadow-slate-900/50 flex items-center space-x-2 transition-all"
           >
             <FileOutput className="h-4 w-4" />
             <span>{t('exportData')}</span>
           </button>
           <button
             onClick={() => { setEditingItem(null); setModalOpen(true); }}
-            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-md flex items-center space-x-2 transition-all"
+            className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl shadow-md flex items-center justify-center space-x-2 transition-all"
           >
             <Plus className="h-4 w-4" />
             <span>{activeTab === 'charges' ? t('addCharge') : t('logRevenue')}</span>
@@ -224,6 +232,7 @@ export default function Financials() {
                 <th className="px-5 py-3">{t('category')}</th>
                 <th className="px-5 py-3">{t('description')}</th>
                 <th className="px-5 py-3">{t('flowType')}</th>
+                {activeTab === 'charges' && <th className="px-5 py-3">Facture</th>}
                 <th className="px-5 py-3 text-right">{t('amount')}</th>
                 <th className="px-5 py-3 text-right">{t('actions')}</th>
               </tr>
@@ -231,7 +240,7 @@ export default function Financials() {
             <tbody className="divide-y divide-slate-100 font-medium text-slate-700 dark:text-slate-300">
               {activeTab === 'charges' ? (
                 charges.length === 0 ? (
-                  <tr><td colSpan="7" className="px-5 py-8 text-center text-slate-400 dark:text-slate-500">{t('noCharges')}</td></tr>
+                  <tr><td colSpan="8" className="px-5 py-8 text-center text-slate-400 dark:text-slate-500">{t('noCharges')}</td></tr>
                 ) : (
                   charges.map((item) => (
                     <tr key={item.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-700/30">
@@ -246,8 +255,20 @@ export default function Financials() {
                           <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">{t('manual')}</span>
                         )}
                       </td>
+                      <td className="px-5 py-3.5">
+                        {item.invoice ? (
+                          <span className="text-xs font-mono text-indigo-600 dark:text-indigo-400">
+                            INV-{String(item.invoice.invoiceNumber).padStart(4, '0')}
+                          </span>
+                        ) : (
+                          <span className="text-xs text-slate-400">—</span>
+                        )}
+                      </td>
                       <td className="px-5 py-3.5 text-right font-bold text-red-600 dark:text-red-400">-{(item.amount || 0).toFixed(2)}</td>
                       <td className="px-5 py-3.5 text-right space-x-1">
+                        {item.invoice && (
+                          <a href={`/api/invoices/${item.invoice.id}/download`} className="p-1 hover:bg-indigo-50 text-slate-400 dark:text-slate-500 hover:text-indigo-600 rounded transition-all inline-block" title="Télécharger la facture"><FileText className="h-4 w-4" /></a>
+                        )}
                         <button onClick={() => handleLaunchEdit(item)} className="p-1 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:text-slate-300 rounded transition-all inline-block"><Edit3 className="h-4 w-4" /></button>
                         <button onClick={() => handleDeleteEntry(item.id)} className="p-1 hover:bg-red-50 text-slate-400 dark:text-slate-500 hover:text-red-600 rounded transition-all inline-block"><Trash2 className="h-4 w-4" /></button>
                       </td>
