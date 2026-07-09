@@ -255,17 +255,22 @@ Extract or refine these fields:
 - "type" and "amount" are Strictly Required. If either is missing, set "status" to "incomplete" and set "prompt" to a friendly question in French asking for them.
   - If "type" is missing, provide logical options: ["Dépense (Charge)", "Revenu (Recette)", "Salaire"]
   - If "amount" is missing, provide logical options: ["Passer / Ignorer"]
-- If "type" and "amount" are known, but some recommended fields ("vendor", "date", or "fuelType" for "fuel_purchase") are missing or "unknown", evaluate if we should ask for them.
-  - CRITICAL: Never ask the same question twice! Check the Previous Assistant Prompt ("${context ? context.previousPrompt : ''}"). If you already asked about a field (like asking for vendor name or fuel type) and it is still missing/unknown in the user's latest response, do NOT ask again. Mark the status as "complete" instead.
-  - If a recommended field is missing and has NOT been asked yet, set "status" to "incomplete" and set "prompt" to a friendly question in French asking for that specific detail.
-    - If asking for "fuelType": provide options: ["Gasoil", "Essence", "Passer / Ignorer"]
-    - If asking for "category" of charge: provide options: ["Achat Carburant", "Eau et électricité", "Produits de nettoyage", "Loyer", "Maintenance", "Autre"]
-    - If asking for "category" of revenue: provide options: ["Ventes de carburant", "Ventes boutique", "Services", "Autre"]
-    - If asking for "vendor": provide options: ["Afriquia", "Al Mohit", "Passer / Ignorer"]
-    - If asking for "date": provide options: ["Aujourd'hui", "Hier", "Passer / Ignorer"]
-  - If everything is complete, set "status" to "complete" and "prompt" to null.
-  
-- Whenever "status" is "incomplete", populate the "options" field with an array of 2-5 short text button strings that represent logical choices/answers the user can click instead of typing. Include a "Passer / Ignorer" option where appropriate to make skipping easy. If "status" is "complete", set "options" to null.
+- If "type" and "amount" are known, but some recommended fields ("vendor", "date", or "fuelType" for "fuel_purchase") are missing or "unknown", check if we have already asked for them.
+  - If we have NOT asked for a recommended field yet, set "status" to "incomplete" and prompt the user for it.
+    - If asking for "fuelType": ["Gasoil", "Essence", "Passer / Ignorer"]
+    - If asking for "category" of charge: ["Achat Carburant", "Eau et électricité", "Produits de nettoyage", "Loyer", "Maintenance", "Autre"]
+    - If asking for "category" of revenue: ["Ventes de carburant", "Ventes boutique", "Services", "Autre"]
+    - If asking for "vendor": ["Afriquia", "Al Mohit", "Passer / Ignorer"]
+    - If asking for "date": ["Aujourd'hui", "Hier", "Passer / Ignorer"]
+- If all required and recommended fields are collected OR any remaining recommended fields have already been prompted/skipped, we enter the final Confirmation Step:
+  - Check the Previous Assistant Prompt ("${context ? context.previousPrompt : ''}").
+  - If the previous prompt was NOT yet the final confirmation prompt (i.e., we just finished collecting the fields), do NOT set "status" to "complete". Instead, set "status" to "incomplete" and:
+    - Set "prompt" to: "Toutes les informations sur l'opération sont prêtes. Souhaitez-vous enregistrer l'opération ou ajouter d'autres détails ?"
+    - Set "options" to: ["Enregistrer l'opération", "Ajouter des détails"]
+  - If the previous prompt WAS already the final confirmation prompt:
+    - If the user's response is to confirm (e.g., clicks "Enregistrer l'opération" or says "enregistrer", "valider", "oui", "ok"), set "status" to "complete" and "prompt" to null.
+    - If the user wants to add details (e.g., clicks "Ajouter des détails" or says "ajouter", "modifier", "non"), set "status" to "incomplete", set "prompt" to "Quels détails souhaitez-vous ajouter ou modifier ?", and set "options" to ["Passer / Ignorer"].
+    - If the user responds with something else, update the fields and present the confirmation prompt again.
 
 Return ONLY raw JSON, with no markdown code blocks, no formatting, and no explanation.
 JSON Schema to return:
