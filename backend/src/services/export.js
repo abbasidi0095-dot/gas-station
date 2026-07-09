@@ -1,10 +1,21 @@
 import ExcelJS from 'exceljs';
 import PDFDocument from 'pdfkit';
 
-/**
- * Generate formatted Excel workbook of gas station financial data.
- * Includes a per-vendor sheet for each vendor present in the charges data.
- */
+function groupByDate(records) {
+  const map = {};
+  for (const r of records) {
+    const key = new Date(r.date).toISOString().split('T')[0];
+    if (!map[key]) map[key] = [];
+    map[key].push(r);
+  }
+  const sorted = Object.keys(map).sort();
+  return sorted.map(d => ({ date: d, records: map[d] }));
+}
+
+function isAlMohit(r) {
+  return r.vendor && r.vendor.name === 'Al Mohit';
+}
+
 export async function generateExcelExport({ range, startDate, endDate, revenues, charges, receipts, totals }) {
   const workbook = new ExcelJS.Workbook();
   workbook.creator = 'Al Mohit Gas Station';
@@ -59,14 +70,14 @@ export async function generateExcelExport({ range, startDate, endDate, revenues,
   summarySheet.getColumn(4).width = 45;
 
   // ==========================================
-  // SHEET 2: Revenues Ledger
+  // SHEET 2: Revenue Ledger (operation by operation with daily subtotals)
   // ==========================================
   if (revenues.length > 0) {
     const revSheet = workbook.addWorksheet('Revenue Ledger');
     revSheet.views = [{ showGridLines: true }];
-    revSheet.addRow(['Daily Revenue Ledger']);
+    revSheet.addRow(['Daily Revenue Ledger — Operation by Operation']);
     revSheet.getRow(1).font = { size: 14, bold: true };
-    revSheet.addRow(['Date', 'Category', 'Amount (MAD)', 'Description', 'Logged By']);
+    revSheet.addRow(['Date', 'Vendor', 'Category', 'Amount (MAD)', 'Description']);
 
     const revHeader = revSheet.getRow(2);
     revHeader.font = { bold: true, color: { argb: 'FFFFFF' } };
@@ -74,30 +85,60 @@ export async function generateExcelExport({ range, startDate, endDate, revenues,
       cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '375623' } };
     });
 
-    revenues.forEach((r) => {
-      revSheet.addRow([
-        new Date(r.date).toLocaleDateString(),
-        r.category.replace('_', ' ').toUpperCase(),
-        r.amount,
-        r.description || '',
-        r.createdBy || 'Admin',
-      ]);
+    const dailyGroups = groupByDate(revenues);
+    let grandTotal = 0;
+
+    for (const group of dailyGroups) {
+      const rowStart = revSheet.rowCount + 1;
+      group.records.forEach((r) => {
+        revSheet.addRow([
+          new Date(r.date).toLocaleDateString(),
+          r.vendor ? r.vendor.name : '—',
+          r.category.replace('_', ' ').toUpperCase(),
+          r.amount,
+          r.description || '',
+        ]);
+        if (isAlMohit(r)) {
+          const rw = revSheet.lastRow;
+          rw.eachCell((cell) => {
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF0F0' } };
+            cell.font = { color: { argb: 'CC0000' } };
+          });
+        }
+        grandTotal += r.amount;
+      });
+
+      // Daily subtotal row
+      const rowEnd = revSheet.rowCount;
+      const dayAmount = group.records.reduce((s, r) => s + r.amount, 0);
+      const subRow = revSheet.addRow([`Daily Total — ${group.date}`, '', '', dayAmount, `(${group.records.length} operations)`]);
+      subRow.font = { bold: true, italic: true };
+      subRow.getCell(2).alignment = { horizontal: 'right' };
+      subRow.getCell(4).numFmt = '#,##0.00 "MAD"';
+      const subRowCells = subRow.eachCell((cell) => {
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'E8F5E9' } };
+      });
+      revSheet.addRow([]);
+    }
+
+    // Grand total
+    const grandRow = revSheet.addRow(['GRAND TOTAL REVENUE', '', '', grandTotal, `${revenues.length} total operations`]);
+    grandRow.font = { bold: true, size: 12 };
+    grandRow.getCell(4).numFmt = '#,##0.00 "MAD"';
+    grandRow.eachCell((cell) => {
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'C8E6C9' } };
+      cell.border = {
+        top: { style: 'medium' },
+        bottom: { style: 'double' },
+      };
     });
 
-    revSheet.getColumn(3).numFmt = '#,##0.00';
+    revSheet.getColumn(4).numFmt = '#,##0.00';
     revSheet.getColumn(1).width = 15;
-    revSheet.getColumn(2).width = 20;
-    revSheet.getColumn(3).width = 18;
-    revSheet.getColumn(4).width = 45;
-    revSheet.getColumn(5).width = 25;
-
-    const revLastRow = revSheet.rowCount;
-    if (revenues.length > 0) {
-      revSheet.addRow([]);
-      const sumRow = revSheet.addRow(['Total Revenue Sum', '', { formula: `SUM(C3:C${revLastRow})` }, '', '']);
-      sumRow.font = { bold: true };
-      sumRow.getCell(3).numFmt = '#,##0.00 "MAD"';
-    }
+    revSheet.getColumn(2).width = 18;
+    revSheet.getColumn(3).width = 20;
+    revSheet.getColumn(4).width = 18;
+    revSheet.getColumn(5).width = 45;
   }
 
   // ==========================================
@@ -145,7 +186,63 @@ export async function generateExcelExport({ range, startDate, endDate, revenues,
   }
 
   // ==========================================
-  // PER-VENDOR SHEETS (one sheet per vendor)
+  // PER-VENDOR REVENUE SHEETS
+  // ==========================================
+  const revVendorMap = {};
+  revenues.forEach((r) => {
+    const vName = r.vendor ? r.vendor.name : 'Unassigned';
+    if (!revVendorMap[vName]) revVendorMap[vName] = [];
+    revVendorMap[vName].push(r);
+  });
+
+  for (const [vName, vRevs] of Object.entries(revVendorMap).sort()) {
+    const safeName = (vName.replace(/[^a-zA-Z0-9 ]/g, '').slice(0, 24) || 'Revenue') + ' Rev';
+    const vSheet = workbook.addWorksheet(safeName);
+    const isAlMohitSheet = vName === 'Al Mohit';
+    vSheet.views = [{ showGridLines: true }];
+    vSheet.addRow([`${vName} — Revenue Ledger`]);
+    vSheet.getRow(1).font = { size: 14, bold: true };
+    vSheet.addRow(['Date', 'Category', 'Amount (MAD)', 'Description']);
+
+    const vHeader = vSheet.getRow(2);
+    vHeader.font = { bold: true, color: { argb: 'FFFFFF' } };
+    vHeader.eachCell((cell) => {
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: isAlMohitSheet ? 'C00000' : '2F5597' } };
+    });
+
+    vRevs.forEach((r) => {
+      vSheet.addRow([
+        new Date(r.date).toLocaleDateString(),
+        r.category.replace('_', ' ').toUpperCase(),
+        r.amount,
+        r.description || '',
+      ]);
+      if (isAlMohitSheet) {
+        const rw = vSheet.lastRow;
+        rw.eachCell((cell) => {
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF0F0' } };
+          cell.font = { color: { argb: 'CC0000' } };
+        });
+      }
+    });
+
+    vSheet.getColumn(3).numFmt = '#,##0.00';
+    vSheet.getColumn(1).width = 15;
+    vSheet.getColumn(2).width = 22;
+    vSheet.getColumn(3).width = 18;
+    vSheet.getColumn(4).width = 45;
+
+    const vLastRow = vSheet.rowCount;
+    if (vRevs.length > 0) {
+      vSheet.addRow([]);
+      const sumRow = vSheet.addRow(['Total', '', { formula: `SUM(C3:C${vLastRow})` }, '']);
+      sumRow.font = { bold: true };
+      sumRow.getCell(3).numFmt = '#,##0.00 "MAD"';
+    }
+  }
+
+  // ==========================================
+  // PER-VENDOR EXPENSE SHEETS (unchanged)
   // ==========================================
   const vendorsMap = {};
   charges.forEach((c) => {
@@ -156,7 +253,7 @@ export async function generateExcelExport({ range, startDate, endDate, revenues,
 
   for (const [vName, vCharges] of Object.entries(vendorsMap)) {
     const safeName = vName.replace(/[^a-zA-Z0-9 ]/g, '').slice(0, 28) || 'Vendor';
-    const vSheet = workbook.addWorksheet(`${safeName} Ledger`);
+    const vSheet = workbook.addWorksheet(`${safeName} (Exp)`);
     vSheet.views = [{ showGridLines: true }];
     vSheet.addRow([`${vName} — Expenses Ledger`]);
     vSheet.getRow(1).font = { size: 14, bold: true };
@@ -234,9 +331,6 @@ export async function generateExcelExport({ range, startDate, endDate, revenues,
   return buffer;
 }
 
-/**
- * Generate formatted PDF report of gas station financial data
- */
 export function generatePDFExport({ range, startDate, endDate, revenues, charges, receipts, totals }) {
   return new Promise((resolve, reject) => {
     try {
@@ -249,74 +343,88 @@ export function generatePDFExport({ range, startDate, endDate, revenues, charges
       const formattedStart = new Date(startDate).toLocaleDateString();
       const formattedEnd = new Date(endDate).toLocaleDateString();
 
-      doc.fillColor('#1F4E78').fontSize(20).text('AL MOHIT GAS STATION STATEMENT', { align: 'center', underline: true });
+      doc.fillColor('#1F4E78').fontSize(20).font('Helvetica-Bold').text('AL MOHIT GAS STATION STATEMENT', { align: 'center' });
+      doc.moveTo(50, doc.y).lineTo(562, doc.y).strokeColor('#1F4E78').lineWidth(1.5).stroke();
       doc.moveDown(1);
 
-      doc.fillColor('#262626').fontSize(11);
-      doc.text(`Report Period: ${formattedStart} to ${formattedEnd}`);
-      doc.text(`Generated At: ${new Date().toLocaleString()}`);
-      doc.text(`Scope Filter: Revenue, Charges & Receipts Summary`);
-      doc.moveDown(1.5);
+      doc.fillColor('#555').fontSize(10).font('Helvetica');
+      doc.text(`Period: ${formattedStart}  —  ${formattedEnd}`);
+      doc.text(`Generated: ${new Date().toLocaleString()}`);
+      doc.moveDown(1);
 
-      // OVERVIEW METRICS BOX
-      doc.rect(50, doc.y, 512, 100).fillColor('#F2F2F2').fill();
-
-      doc.fillColor('#1F4E78').fontSize(12).font('Helvetica-Bold');
-      doc.text('FINANCIAL OVERVIEW (MAD)', 65, doc.y - 90);
-      doc.moveDown(0.5);
-
-      doc.fontSize(10).fillColor('#333333');
-      doc.text(`Total Sales Revenue:`, 65, doc.y);
-      doc.text(`${totals.totalRevenue.toFixed(2)} MAD`, 250, doc.y - 12, { font: 'Helvetica-Bold' });
-
-      doc.text(`Total Operating Expenses:`, 65, doc.y + 10);
-      doc.text(`${totals.totalCharges.toFixed(2)} MAD`, 250, doc.y - 2, { font: 'Helvetica-Bold' });
-
-      doc.text(`Net Operating Profit:`, 65, doc.y + 20);
+      doc.fontSize(11).fillColor('#262626').font('Helvetica-Bold');
       const isProfitable = totals.netProfit >= 0;
-      doc.fillColor(isProfitable ? '#375623' : '#C00000').text(
-        `${totals.netProfit.toFixed(2)} MAD`,
-        250,
-        doc.y + 8,
-        { font: 'Helvetica-Bold' }
-      );
+      const metricY = doc.y + 2;
+      doc.text(`Total Revenue:`, 50, metricY);
+      doc.text(`${totals.totalRevenue.toFixed(2)} MAD`, 230, metricY);
+      doc.text(`Total Expenses:`, 350, metricY);
+      doc.text(`${totals.totalCharges.toFixed(2)} MAD`, 480, metricY);
+      doc.text(`Net Profit:`, 50, metricY + 18);
+      doc.fillColor(isProfitable ? '#375623' : '#C00000').text(`${totals.netProfit.toFixed(2)} MAD`, 230, metricY + 18);
+      doc.fillColor('#262626').text(`${revenues.length} rev. ops  ·  ${charges.length} exp. entries`, 350, metricY + 18, { fontSize: 9 });
+      doc.moveTo(50, metricY + 42).lineTo(562, metricY + 42).strokeColor('#CCC').lineWidth(0.5).stroke();
+      doc.y = metricY + 50;
+      doc.fillColor('#262626');
+      doc.moveDown(1);
 
-      doc.y = doc.y + 35;
-      doc.moveDown(1.5);
-
-      // REVENUE TABLE
+      // REVENUE TABLE — all records with daily subtotals
       if (revenues.length > 0) {
-        doc.fillColor('#375623').fontSize(13).font('Helvetica-Bold').text('REVENUE STREAM BREAKDOWN', 50, doc.y);
+        if (doc.y > 500) doc.addPage();
+
+        doc.fillColor('#375623').fontSize(13).font('Helvetica-Bold').text('REVENUE — OPERATION BY OPERATION', 50, doc.y);
         doc.moveDown(0.5);
 
         let y = doc.y;
         doc.rect(50, y, 512, 20).fillColor('#375623').fill();
-        doc.fillColor('#FFFFFF').fontSize(9).font('Helvetica-Bold');
+        doc.fillColor('#FFFFFF').fontSize(8).font('Helvetica-Bold');
         doc.text('Date', 55, y + 6);
-        doc.text('Category', 150, y + 6);
-        doc.text('Description', 280, y + 6);
-        doc.text('Amount (MAD)', 480, y + 6, { align: 'right' });
+        doc.text('Vendor', 120, y + 6);
+        doc.text('Category', 200, y + 6);
+        doc.text('Amount', 460, y + 6, { align: 'right' });
 
-        y += 20;
-
+        y += 22;
         doc.fillColor('#333333').font('Helvetica');
-        revenues.slice(0, 25).forEach((r) => {
-          doc.rect(50, y, 512, 18).fillColor(y % 36 === 0 ? '#FFFFFF' : '#F9FBF9').fill();
-          doc.fillColor('#333333');
-          doc.text(new Date(r.date).toLocaleDateString(), 55, y + 5);
-          doc.text(r.category.replace('_', ' ').toUpperCase(), 150, y + 5);
-          doc.text(r.description ? r.description.substring(0, 32) : 'Daily log', 280, y + 5);
-          doc.text(r.amount.toFixed(2), 430, y + 5, { width: 120, align: 'right' });
-          y += 18;
-        });
 
-        doc.y = y + 10;
-        doc.moveDown(1.5);
+        const dailyGroups = groupByDate(revenues);
+
+        for (const group of dailyGroups) {
+          for (const r of group.records) {
+            if (y > 720) { doc.addPage(); y = 50; }
+            const bg = isAlMohit(r) ? '#FFF0F0' : (y % 32 === 0 ? '#FFFFFF' : '#F9FBF9');
+            doc.rect(50, y, 512, 16).fillColor(bg).fill();
+            doc.fillColor(isAlMohit(r) ? '#CC0000' : '#333333').fontSize(8);
+            doc.text(new Date(r.date).toLocaleDateString(), 55, y + 4);
+            doc.text(r.vendor ? r.vendor.name : '—', 120, y + 4);
+            doc.text(r.category.replace('_', ' ').toUpperCase(), 200, y + 4);
+            doc.text(r.amount.toFixed(2), 430, y + 4, { width: 120, align: 'right' });
+            y += 16;
+          }
+
+          // Daily subtotal
+          if (y > 700) { doc.addPage(); y = 50; }
+          const dayTotal = group.records.reduce((s, r) => s + r.amount, 0);
+          doc.rect(50, y, 512, 18).fillColor('#E8F5E9').fill();
+          doc.fillColor('#1B5E20').fontSize(8).font('Helvetica-Bold');
+          doc.text(`Daily Total — ${group.date}`, 55, y + 5);
+          doc.text(`${dayTotal.toFixed(2)} MAD`, 430, y + 5, { width: 120, align: 'right' });
+          y += 20;
+        }
+
+        // Grand total
+        if (y > 700) { doc.addPage(); y = 50; }
+        const grandTotal = revenues.reduce((s, r) => s + r.amount, 0);
+        doc.rect(50, y, 512, 20).fillColor('#1B5E20').fill();
+        doc.fillColor('#FFFFFF').fontSize(9).font('Helvetica-Bold');
+        doc.text(`GRAND TOTAL — ${revenues.length} operations`, 55, y + 6);
+        doc.text(`${grandTotal.toFixed(2)} MAD`, 430, y + 6, { width: 120, align: 'right' });
+        doc.y = y + 30;
+        doc.fillColor('#262626');
+        doc.moveDown(1);
       }
 
-      // EXPENSES TABLE
+      // EXPENSES TABLE — all records
       if (charges.length > 0) {
-        if (doc.y > 550) doc.addPage();
+        if (doc.y > 500) doc.addPage();
 
         doc.fillColor('#C00000').fontSize(13).font('Helvetica-Bold').text('OPERATING CHARGES & EXPENSES', 50, doc.y);
         doc.moveDown(0.5);
@@ -327,23 +435,103 @@ export function generatePDFExport({ range, startDate, endDate, revenues, charges
         doc.text('Date', 55, y + 6);
         doc.text('Vendor', 150, y + 6);
         doc.text('Category', 280, y + 6);
-        doc.text('Amount (MAD)', 480, y + 6, { align: 'right' });
+        doc.text('Amount (MAD)', 460, y + 6, { align: 'right' });
 
-        y += 20;
+        y += 22;
 
         doc.fillColor('#333333').font('Helvetica');
-        charges.slice(0, 25).forEach((c) => {
-          doc.rect(50, y, 512, 18).fillColor(y % 36 === 0 ? '#FFFFFF' : '#FBF9F9').fill();
-          doc.fillColor('#333333');
-          doc.text(new Date(c.date).toLocaleDateString(), 55, y + 5);
-          doc.text(c.vendor ? c.vendor.name : 'Other / Non-Vendor', 150, y + 5);
-          doc.text(c.category.replace('_', ' ').toUpperCase(), 280, y + 5);
-          doc.text(c.amount.toFixed(2), 430, y + 5, { width: 120, align: 'right' });
-          y += 18;
+        charges.forEach((c) => {
+          if (y > 720) { doc.addPage(); y = 50; }
+          doc.rect(50, y, 512, 16).fillColor(y % 32 === 0 ? '#FFFFFF' : '#FBF9F9').fill();
+          doc.fillColor('#333333').fontSize(8);
+          doc.text(new Date(c.date).toLocaleDateString(), 55, y + 4);
+          doc.text(c.vendor ? c.vendor.name : 'Other / Non-Vendor', 150, y + 4);
+          doc.text(c.category.replace('_', ' ').toUpperCase(), 280, y + 4);
+          doc.text(c.amount.toFixed(2), 440, y + 4, { width: 120, align: 'right' });
+          y += 16;
         });
 
-        doc.y = y + 10;
-        doc.moveDown(1.5);
+        // Grand total for expenses
+        if (y > 700) { doc.addPage(); y = 50; }
+        const expTotal = charges.reduce((s, c) => s + c.amount, 0);
+        doc.rect(50, y, 512, 20).fillColor('#C00000').fill();
+        doc.fillColor('#FFFFFF').fontSize(9).font('Helvetica-Bold');
+        doc.text(`TOTAL EXPENSES — ${charges.length} entries`, 55, y + 6);
+        doc.text(`${expTotal.toFixed(2)} MAD`, 440, y + 6, { width: 120, align: 'right' });
+        doc.y = y + 30;
+      }
+
+      // PER-VENDOR REVENUE BREAKDOWN
+      if (revenues.length > 0) {
+        const revVendorMap = {};
+        revenues.forEach((r) => {
+          const vName = r.vendor ? r.vendor.name : 'Unassigned';
+          if (!revVendorMap[vName]) revVendorMap[vName] = [];
+          revVendorMap[vName].push(r);
+        });
+
+        const vendorPriority = ['Al Mohit', 'Afriquia'];
+        const vendorNames = Object.keys(revVendorMap).sort((a, b) => {
+          const ai = vendorPriority.indexOf(a);
+          const bi = vendorPriority.indexOf(b);
+          if (ai !== -1 && bi !== -1) return ai - bi;
+          if (ai !== -1) return -1;
+          if (bi !== -1) return 1;
+          return a.localeCompare(b);
+        });
+
+        for (const vName of vendorNames) {
+          const vRevs = revVendorMap[vName];
+          if (doc.y > 500) doc.addPage();
+
+          const headerColor = vName === 'Al Mohit' ? '#C00000' : '#2F5597';
+          doc.fillColor(headerColor).fontSize(13).font('Helvetica-Bold').text(`${vName} — Revenue Breakdown`, 50, doc.y);
+          doc.moveDown(0.5);
+
+          let y = doc.y;
+          doc.rect(50, y, 512, 20).fillColor(headerColor).fill();
+          doc.fillColor('#FFFFFF').fontSize(8).font('Helvetica-Bold');
+          doc.text('Date', 55, y + 6);
+          doc.text('Category', 120, y + 6);
+          doc.text('Amount', 460, y + 6, { align: 'right' });
+
+          y += 22;
+          doc.fillColor('#333333').font('Helvetica');
+
+          const dailyGroups = groupByDate(vRevs);
+          for (const group of dailyGroups) {
+            for (const r of group.records) {
+              if (y > 720) { doc.addPage(); y = 50; }
+              const bg = vName === 'Al Mohit' ? (y % 32 === 0 ? '#FFF5F5' : '#FFEBEB') : (y % 32 === 0 ? '#FFFFFF' : '#F0F4FF');
+              doc.rect(50, y, 512, 16).fillColor(bg).fill();
+              doc.fillColor(vName === 'Al Mohit' ? '#CC0000' : '#333333').fontSize(8);
+              doc.text(new Date(r.date).toLocaleDateString(), 55, y + 4);
+              doc.text(r.category.replace('_', ' ').toUpperCase(), 120, y + 4);
+              doc.text(r.amount.toFixed(2), 430, y + 4, { width: 120, align: 'right' });
+              y += 16;
+            }
+
+            if (y > 700) { doc.addPage(); y = 50; }
+            const dayTotal = group.records.reduce((s, r) => s + r.amount, 0);
+            const subBg = vName === 'Al Mohit' ? '#FFCDD2' : '#C5CAE9';
+            doc.rect(50, y, 512, 18).fillColor(subBg).fill();
+            doc.fillColor(vName === 'Al Mohit' ? '#B71C1C' : '#1A237E').fontSize(8).font('Helvetica-Bold');
+            doc.text(`Daily Total — ${group.date}`, 55, y + 5);
+            doc.text(`${dayTotal.toFixed(2)} MAD`, 430, y + 5, { width: 120, align: 'right' });
+            y += 20;
+          }
+
+          if (y > 700) { doc.addPage(); y = 50; }
+          const vTotal = vRevs.reduce((s, r) => s + r.amount, 0);
+          const totalBg = vName === 'Al Mohit' ? '#C00000' : '#1A237E';
+          doc.rect(50, y, 512, 20).fillColor(totalBg).fill();
+          doc.fillColor('#FFFFFF').fontSize(9).font('Helvetica-Bold');
+          doc.text(`${vName} TOTAL — ${vRevs.length} operations`, 55, y + 6);
+          doc.text(`${vTotal.toFixed(2)} MAD`, 430, y + 6, { width: 120, align: 'right' });
+          doc.y = y + 30;
+          doc.fillColor('#262626');
+          doc.moveDown(1);
+        }
       }
 
       // FOOTER / PAGE NUMBERING
@@ -353,8 +541,7 @@ export function generatePDFExport({ range, startDate, endDate, revenues, charges
         doc.fillColor('#7F7F7F').fontSize(8);
         doc.text(
           `Page ${i + 1} of ${rangeOfPages.count} — Al Mohit Gas Station`,
-          50,
-          750,
+          50, 750,
           { align: 'center' }
         );
       }

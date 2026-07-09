@@ -45,64 +45,65 @@ router.post('/scan', authenticate, isAdmin, upload.single('receipt'), async (req
 
   try {
     const fileBuffer = fs.readFileSync(filePath);
-    const ocrResult = await scanReceiptWithGemini(fileBuffer, req.file.mimetype);
+    const ocrResults = await scanReceiptWithGemini(fileBuffer, req.file.mimetype);
 
-    let vendor = null;
-    if (ocrResult.vendor && ocrResult.vendor !== 'unknown') {
-      // Normalize by lowercasing and stripping spaces/hyphens/underscores so that
-      // "Al Mohit" / "AL-MOHIT" / "almohit" all match a seeded "Almohit".
-      const normalize = (s) => String(s).toLowerCase().replace(/[\s\-_]+/g, '');
-      const target = normalize(ocrResult.vendor);
-      const allVendors = await prisma.vendor.findMany();
-      vendor =
-        allVendors.find((v) => {
+    const allVendors = await prisma.vendor.findMany();
+    const normalize = (s) => String(s).toLowerCase().replace(/[\s\-_]+/g, '');
+    const results = [];
+
+    for (const ocrResult of ocrResults) {
+      let vendor = null;
+      if (ocrResult.vendor && ocrResult.vendor !== 'unknown') {
+        const target = normalize(ocrResult.vendor);
+        vendor = allVendors.find((v) => {
           const n = normalize(v.name);
           return n === target || n.includes(target) || target.includes(n);
         }) || null;
-    }
+      }
 
-    const confidence = ocrResult.confidence || 0.0;
-    const isHighConfidence = confidence >= 0.8 && vendor !== null && ocrResult.amount !== null;
-    const initialStatus = isHighConfidence ? 'confirmed' : 'pending_review';
+      const confidence = ocrResult.confidence || 0.0;
+      const isHighConfidence = confidence >= 0.8 && vendor !== null && ocrResult.amount !== null;
+      const initialStatus = isHighConfidence ? 'confirmed' : 'pending_review';
 
-    const receipt = await prisma.receipt.create({
-      data: {
-        imageUrl,
-        vendorId: vendor ? vendor.id : null,
-        amount: ocrResult.amount,
-        currency: ocrResult.currency || 'MAD',
-        extractedRawText: ocrResult.extractedRawText,
-        confidenceScore: confidence,
-        status: initialStatus,
-        purpose: 'expense',
-        scannedBy: req.user.id,
-      },
-      include: {
-        vendor: true,
-        user: { select: { name: true } },
-      },
-    });
-
-    if (initialStatus === 'confirmed') {
-      await prisma.charge.create({
+      const receipt = await prisma.receipt.create({
         data: {
-          vendorId: vendor.id,
-          receiptId: receipt.id,
+          imageUrl,
+          vendorId: vendor ? vendor.id : null,
           amount: ocrResult.amount,
-          category: 'fuel_purchase',
-          date: ocrResult.date ? new Date(ocrResult.date) : new Date(),
-          description: `Auto-scanned fuel purchase via Vertex AI (confidence: ${(confidence * 100).toFixed(0)}%)`,
-          createdBy: req.user.id,
+          currency: ocrResult.currency || 'MAD',
+          fuelType: ocrResult.fuelType || null,
+          extractedRawText: ocrResult.extractedRawText,
+          confidenceScore: confidence,
+          status: initialStatus,
+          purpose: 'expense',
+          scannedBy: req.user.id,
+        },
+        include: {
+          vendor: true,
+          user: { select: { name: true } },
         },
       });
+
+      if (initialStatus === 'confirmed') {
+        await prisma.charge.create({
+          data: {
+            vendorId: vendor.id,
+            receiptId: receipt.id,
+            amount: ocrResult.amount,
+            category: 'fuel_purchase',
+            date: ocrResult.date ? new Date(ocrResult.date) : new Date(),
+            description: `Auto-scanned fuel purchase via Vertex AI (confidence: ${(confidence * 100).toFixed(0)}%)`,
+            createdBy: req.user.id,
+          },
+        });
+      }
+
+      results.push({ receipt, autoFiled: isHighConfidence });
     }
 
     return res.status(201).json({
-      message: isHighConfidence
-        ? 'Receipt scan successful. High confidence, auto-filed under expense ledger.'
-        : 'Receipt scan complete. Low confidence or unrecognized vendor; sent to Admin review queue.',
-      receipt,
-      autoFiled: isHighConfidence,
+      message: `Processed ${results.length} receipt(s).`,
+      results,
     });
   } catch (error) {
     console.error('Scan receipts route error:', error);
@@ -174,35 +175,39 @@ router.post('/scan-bulk', authenticate, isAdmin, upload.array('receipts', 20), a
     const filePath = file.path;
     try {
       const fileBuffer = fs.readFileSync(filePath);
-      const ocrResult = await scanReceiptWithGemini(fileBuffer, file.mimetype);
+      const ocrResults = await scanReceiptWithGemini(fileBuffer, file.mimetype);
 
-      let vendor = null;
-      if (ocrResult.vendor && ocrResult.vendor !== 'unknown') {
-        const normalize = (s) => String(s).toLowerCase().replace(/[\s\-_]+/g, '');
-        const target = normalize(ocrResult.vendor);
-        const allVendors = await prisma.vendor.findMany();
-        vendor = allVendors.find((v) => {
-          const n = normalize(v.name);
-          return n === target || n.includes(target) || target.includes(n);
-        }) || null;
+      const allVendors = await prisma.vendor.findMany();
+      const normalize = (s) => String(s).toLowerCase().replace(/[\s\-_]+/g, '');
+
+      for (const ocrResult of ocrResults) {
+        let vendor = null;
+        if (ocrResult.vendor && ocrResult.vendor !== 'unknown') {
+          const target = normalize(ocrResult.vendor);
+          vendor = allVendors.find((v) => {
+            const n = normalize(v.name);
+            return n === target || n.includes(target) || target.includes(n);
+          }) || null;
+        }
+
+        const receipt = await prisma.receipt.create({
+          data: {
+            imageUrl,
+            vendorId: vendor ? vendor.id : null,
+            amount: ocrResult.amount,
+            currency: ocrResult.currency || 'MAD',
+            fuelType: ocrResult.fuelType || null,
+            extractedRawText: ocrResult.extractedRawText,
+            confidenceScore: ocrResult.confidence || 0,
+            status: 'pending_review',
+            purpose: 'revenue',
+            scannedBy: req.user.id,
+          },
+          include: { vendor: true },
+        });
+
+        results.push({ success: true, receipt });
       }
-
-      const receipt = await prisma.receipt.create({
-        data: {
-          imageUrl,
-          vendorId: vendor ? vendor.id : null,
-          amount: ocrResult.amount,
-          currency: ocrResult.currency || 'MAD',
-          extractedRawText: ocrResult.extractedRawText,
-          confidenceScore: ocrResult.confidence || 0,
-          status: 'pending_review',
-          purpose: 'revenue',
-          scannedBy: req.user.id,
-        },
-        include: { vendor: true },
-      });
-
-      results.push({ success: true, receipt });
     } catch (error) {
       console.error('Bulk scan file error:', error);
       results.push({ success: false, filename: file.originalname, error: error.message || 'OCR failed for this file.' });
@@ -230,7 +235,7 @@ router.get('/sold-gas/queue', authenticate, isAdmin, async (req, res) => {
 // PUT /api/receipts/sold-gas/review/:id
 router.put('/sold-gas/review/:id', authenticate, isAdmin, async (req, res) => {
   const { id } = req.params;
-  const { vendorId, amount, date, status, description } = req.body;
+  const { vendorId, amount, date, status, description, fuelType } = req.body;
 
   if (!status || (status !== 'confirmed' && status !== 'rejected')) {
     return res.status(400).json({ error: 'Valid review status ("confirmed" or "rejected") is required.' });
@@ -271,6 +276,7 @@ router.put('/sold-gas/review/:id', authenticate, isAdmin, async (req, res) => {
           data: {
             amount: parseFloat(amount),
             category: 'fuel_sales',
+            fuelType: fuelType || null,
             date: new Date(date),
             description: description || 'Sold gas from scanned receipt',
             createdBy: req.user.id,

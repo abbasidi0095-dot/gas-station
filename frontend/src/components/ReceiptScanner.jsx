@@ -106,7 +106,8 @@ export default function ReceiptScanner({ onClose, onScanComplete }) {
       if (!res.ok) throw new Error(data.error || 'Server failed to analyze receipt.');
 
       // Populate verify fields from OCR result
-      const receipt = data.receipt;
+      const scanItem = data.results && data.results[0];
+      const receipt = scanItem ? scanItem.receipt : data.receipt;
       setVVendorId(receipt.vendorId || '');
       setVAmount(receipt.amount != null ? String(receipt.amount) : '');
       setVDate(receipt.scannedAt ? receipt.scannedAt.split('T')[0] : '');
@@ -114,7 +115,7 @@ export default function ReceiptScanner({ onClose, onScanComplete }) {
       setVDescription('');
       setVConfidence(receipt.confidenceScore || 0);
       setVerifyMode(true);
-      setScanResult({ success: true, autoFiled: data.autoFiled, receipt, message: data.message });
+      setScanResult({ success: true, autoFiled: scanItem ? scanItem.autoFiled : data.autoFiled, receipt, message: data.message });
       if (onScanComplete) onScanComplete();
     } catch (err) {
       console.error(err);

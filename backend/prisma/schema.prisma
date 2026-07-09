@@ -61,6 +61,7 @@ model Receipt {
   confidenceScore  Float?
   status           String   // "pending_review" | "confirmed" | "rejected"
   purpose          String   @default("expense") // "expense" | "revenue"
+  fuelType         String?  // "gasoil" | "essence" | undefined
   scannedBy        String
   user             User     @relation("ScannedBy", fields: [scannedBy], references: [id])
   scannedAt        DateTime @default(now())
@@ -86,6 +87,7 @@ model Revenue {
   id          String   @id @default(uuid())
   amount      Float
   category    String   // "fuel_sales" | "shop_sales" | "services" | "other"
+  fuelType    String?  // "gasoil" | "essence" | undefined
   date        DateTime
   description String?
   createdBy   String

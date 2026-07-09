@@ -1,6 +1,14 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useLanguage } from '../context/LanguageContext.jsx';
-import { UploadCloud, X, RefreshCw, Fuel, Check, Ban, ImageIcon, AlertCircle, ChevronRight } from 'lucide-react';
+import { UploadCloud, X, RefreshCw, Fuel, Check, Ban, AlertCircle, ChevronLeft, ChevronRight, ImageIcon, ScanLine } from 'lucide-react';
+import { Dropzone } from '@/components/ui/dropzone';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselPrevious,
+  CarouselNext,
+} from '@/components/ui/carousel';
 
 export default function SoldGas() {
   const { t } = useLanguage();
@@ -8,59 +16,44 @@ export default function SoldGas() {
   const [queue, setQueue] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Upload state
   const [files, setFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState({ done: 0, total: 0, errors: 0 });
-  const fileInputRef = useRef(null);
 
-  // Carousel state
   const [currentIdx, setCurrentIdx] = useState(0);
   const [vVendorId, setVVendorId] = useState('');
   const [vAmount, setVAmount] = useState('');
   const [vDate, setVDate] = useState('');
+  const [vFuelType, setVFuelType] = useState('');
   const [vDescription, setVDescription] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const thumbRef = useRef(null);
 
-  const fetchQueue = async () => {
+  const fetchQueue = useCallback(async () => {
     setLoading(true);
     try {
-      const vRes = await fetch('/api/financials/vendors');
+      const [vRes, qRes] = await Promise.all([
+        fetch('/api/financials/vendors'),
+        fetch('/api/receipts/sold-gas/queue'),
+      ]);
       if (vRes.ok) setVendors(await vRes.json());
-      const qRes = await fetch('/api/receipts/sold-gas/queue');
       if (qRes.ok) {
         const qData = await qRes.json();
         setQueue(qData);
         if (qData.length > 0) loadReceipt(qData[0]);
-        else { setCurrentIdx(0); setVVendorId(''); setVAmount(''); setVDate(''); setVDescription(''); }
+        else { setCurrentIdx(0); setVVendorId(''); setVAmount(''); setVDate(''); setVFuelType(''); setVDescription(''); }
       }
     } catch (err) { console.error(err); } finally { setLoading(false); }
-  };
+  }, []);
 
-  useEffect(() => { fetchQueue(); }, []);
+  useEffect(() => { fetchQueue(); }, [fetchQueue]);
 
   const loadReceipt = (rc) => {
     setVVendorId(rc.vendorId || '');
     setVAmount(rc.amount != null ? String(rc.amount) : '');
     setVDate(rc.scannedAt ? rc.scannedAt.split('T')[0] : new Date().toISOString().split('T')[0]);
+    setVFuelType(rc.fuelType || 'gasoil');
     setVDescription(rc.extractedRawText || '');
-  };
-
-  const handleFileSelect = (e) => {
-    const selected = Array.from(e.target.files || []);
-    if (selected.length > 0) {
-      setFiles(selected);
-      setUploadProgress({ done: 0, total: selected.length, errors: 0 });
-    }
-  };
-
-  const handleDrop = (e) => {
-    e.preventDefault();
-    const dropped = Array.from(e.dataTransfer.files || []);
-    if (dropped.length > 0) {
-      setFiles(dropped);
-      setUploadProgress({ done: 0, total: dropped.length, errors: 0 });
-    }
   };
 
   const handleUpload = async () => {
@@ -76,9 +69,7 @@ export default function SoldGas() {
       if (!res.ok) throw new Error(data.error || 'Bulk upload failed.');
 
       let errors = 0;
-      if (data.results) {
-        errors = data.results.filter((r) => !r.success).length;
-      }
+      if (data.results) errors = data.results.filter((r) => !r.success).length;
       setUploadProgress({ done: files.length, total: files.length, errors });
       setFiles([]);
       await fetchQueue();
@@ -98,6 +89,7 @@ export default function SoldGas() {
         vendorId: status === 'confirmed' ? vVendorId : undefined,
         amount: status === 'confirmed' ? vAmount : undefined,
         date: status === 'confirmed' ? vDate : undefined,
+        fuelType: status === 'confirmed' ? vFuelType : undefined,
         description: status === 'confirmed' ? vDescription : undefined,
       };
       const res = await fetch(`/api/receipts/sold-gas/review/${currentReceipt.id}`, {
@@ -110,11 +102,7 @@ export default function SoldGas() {
 
       const nextIdx = currentIdx >= queue.length - 1 ? currentIdx - 1 : currentIdx;
       await fetchQueue();
-      if (nextIdx >= 0 && nextIdx < queue.length - 1) {
-        setCurrentIdx(Math.max(0, nextIdx));
-      } else {
-        setCurrentIdx(0);
-      }
+      setCurrentIdx(Math.max(0, Math.min(nextIdx, queue.length - 2)));
     } catch (err) {
       alert(err.message || 'Error processing review.');
     } finally {
@@ -122,84 +110,53 @@ export default function SoldGas() {
     }
   };
 
+  const handleDrop = useCallback((acceptedFiles) => {
+    setFiles((prev) => [...prev, ...acceptedFiles].slice(0, 20));
+  }, []);
+
+  const removeFile = useCallback((idx) => {
+    setFiles((prev) => prev.filter((_, i) => i !== idx));
+  }, []);
+
   const currentReceipt = queue[currentIdx];
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-black text-slate-900 tracking-tight flex items-center space-x-2">
-          <Fuel className="h-7 w-7 text-emerald-600" />
-          <span>{t('soldGas')}</span>
-        </h2>
-        <p className="text-sm text-slate-500 mt-1">{t('soldGasDesc')}</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-black text-slate-900 tracking-tight flex items-center space-x-2">
+            <Fuel className="h-7 w-7 text-emerald-600" />
+            <span>{t('soldGas')}</span>
+          </h2>
+          <p className="text-sm text-slate-500 mt-1">{t('soldGasDesc')}</p>
+        </div>
       </div>
 
       {/* Upload Zone */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
-        <div
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
+        <Dropzone
+          src={files}
           onDrop={handleDrop}
-          onDragOver={(e) => e.preventDefault()}
-          onClick={() => !uploading && fileInputRef.current?.click()}
-          className="w-full py-10 border-2 border-dashed border-slate-300 hover:border-emerald-500 rounded-xl cursor-pointer bg-slate-50 hover:bg-emerald-50/20 transition-all flex flex-col items-center justify-center p-6 group"
-        >
-          {uploading ? (
-            <div className="flex flex-col items-center text-center">
-              <RefreshCw className="h-12 w-12 text-emerald-600 mb-4 animate-spin" />
-              <p className="text-sm font-semibold text-slate-800">{t('processingReceipts')}</p>
-              <p className="text-xs text-slate-400 mt-1">{uploadProgress.done} / {uploadProgress.total}</p>
-            </div>
-          ) : (
-            <>
-              <UploadCloud className="h-12 w-12 text-slate-400 group-hover:text-emerald-600 mb-4" />
-              <p className="text-sm font-semibold text-slate-700">{t('soldGasDrop')}</p>
-              <span className="text-xs text-slate-400 mt-1">{t('soldGasFileTypes')}</span>
-            </>
-          )}
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileSelect}
-            accept="image/*,application/pdf"
-            multiple
-            className="hidden"
-          />
-        </div>
-
+          onRemove={removeFile}
+          accept={{ 'image/*': ['.png', '.jpg', '.jpeg', '.webp'], 'application/pdf': ['.pdf'] }}
+          maxSize={10 * 1024 * 1024}
+          maxFiles={20}
+          disabled={uploading}
+        />
         {files.length > 0 && !uploading && (
-          <div className="mt-4 space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">{files.length} {t('receiptsSelected')}</span>
-              <button
-                onClick={(e) => { e.stopPropagation(); handleUpload(); }}
-                className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-sm flex items-center space-x-2 transition-all shadow-md"
-              >
-                <UploadCloud className="h-4 w-4" />
-                <span>{t('scanAll')}</span>
-              </button>
-            </div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-2">
-              {files.map((f, i) => (
-                <div key={i} className="relative aspect-square bg-slate-100 rounded-lg overflow-hidden border border-slate-200 flex items-center justify-center">
-                  {f.type.startsWith('image/') ? (
-                    <img src={URL.createObjectURL(f)} alt={f.name} className="h-full w-full object-cover" />
-                  ) : (
-                    <ImageIcon className="h-8 w-8 text-slate-400" />
-                  )}
-                  <button
-                    onClick={(e) => { e.stopPropagation(); setFiles(files.filter((_, idx) => idx !== i)); }}
-                    className="absolute top-1 right-1 p-1 bg-slate-900/70 hover:bg-slate-900 text-white rounded-full"
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
-                </div>
-              ))}
-            </div>
+          <div className="mt-4 flex items-center justify-end">
+            <button
+              onClick={handleUpload}
+              className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-sm flex items-center space-x-2 transition-all shadow-lg shadow-emerald-600/20 hover:shadow-emerald-600/30"
+            >
+              <ScanLine className="h-4 w-4" />
+              <span>{t('scanAll')} ({files.length})</span>
+            </button>
           </div>
         )}
-
         {uploadProgress.done > 0 && !uploading && (
-          <div className={`mt-4 p-3 rounded-lg flex items-center space-x-2 text-sm font-medium ${uploadProgress.errors > 0 ? 'bg-amber-50 text-amber-700' : 'bg-emerald-50 text-emerald-700'}`}>
-            {uploadProgress.errors > 0 ? <AlertCircle className="h-4 w-4" /> : <Check className="h-4 w-4" />}
+          <div className={`mt-4 p-3 rounded-xl flex items-center space-x-2 text-sm font-medium ${uploadProgress.errors > 0 ? 'bg-amber-50 text-amber-700 border border-amber-200' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'}`}>
+            {uploadProgress.errors > 0 ? <AlertCircle className="h-4 w-4 shrink-0" /> : <Check className="h-4 w-4 shrink-0" />}
             <span>{uploadProgress.done - uploadProgress.errors} {t('processedOk')}{uploadProgress.errors > 0 ? `, ${uploadProgress.errors} ${t('processedFailed')}` : ''}</span>
           </div>
         )}
@@ -207,126 +164,179 @@ export default function SoldGas() {
 
       {/* Approval Carousel */}
       {loading ? (
-        <div className="w-full py-12 flex justify-center items-center space-x-2">
-          <RefreshCw className="h-5 w-5 text-emerald-500 animate-spin" />
-          <span className="text-sm font-semibold text-slate-500">{t('loadingQueue')}</span>
+        <div className="w-full py-16 flex flex-col items-center space-y-3">
+          <div className="h-8 w-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+          <span className="text-sm font-semibold text-slate-400">{t('loadingQueue')}</span>
         </div>
       ) : queue.length === 0 ? (
-        <div className="max-w-md mx-auto text-center py-16 bg-white rounded-2xl border border-slate-100 p-8 shadow-sm">
-          <div className="p-3 bg-emerald-50 rounded-full text-emerald-600 max-w-fit mx-auto mb-4"><Fuel className="h-10 w-10" /></div>
+        <div className="max-w-lg mx-auto text-center py-16 bg-white rounded-2xl border border-slate-100 shadow-sm">
+          <div className="p-4 bg-emerald-50 rounded-full text-emerald-500 inline-flex mb-4">
+            <Fuel className="h-10 w-10" />
+          </div>
           <h3 className="font-bold text-slate-900 text-lg">{t('soldGasQueueClear')}</h3>
-          <p className="text-sm text-slate-500 mt-2">{t('soldGasQueueClearDesc')}</p>
+          <p className="text-sm text-slate-500 mt-2 max-w-sm mx-auto">{t('soldGasQueueClearDesc')}</p>
         </div>
       ) : (
-        <div className="space-y-4">
-          {/* Progress */}
+        <div className="space-y-4 animate-fade-in-up">
+          {/* Progress bar */}
           <div className="flex items-center justify-between bg-white rounded-xl border border-slate-100 shadow-sm px-5 py-3">
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-3">
               <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">{t('reviewing')}</span>
-              <span className="text-sm font-black text-slate-900">{currentIdx + 1}</span>
-              <span className="text-sm text-slate-400">{t('of')}</span>
-              <span className="text-sm font-bold text-slate-700">{queue.length}</span>
+              <div className="flex items-baseline space-x-1">
+                <span className="text-lg font-black text-slate-900">{currentIdx + 1}</span>
+                <span className="text-sm text-slate-400">/</span>
+                <span className="text-sm font-semibold text-slate-600">{queue.length}</span>
+              </div>
             </div>
-            <div className="flex-1 mx-4 h-2 bg-slate-100 rounded-full overflow-hidden">
+            <div className="flex-1 mx-5 h-2 bg-slate-100 rounded-full overflow-hidden">
               <div
-                className="h-full bg-emerald-500 rounded-full transition-all"
+                className="h-full bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full transition-all duration-500 ease-out"
                 style={{ width: `${((currentIdx + 1) / queue.length) * 100}%` }}
               />
             </div>
-            <span className="text-xs font-bold text-emerald-600">{Math.round(((currentIdx + 1) / queue.length) * 100)}%</span>
+            <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg">
+              {Math.round(((currentIdx + 1) / queue.length) * 100)}%
+            </span>
           </div>
 
-          {/* Carousel item */}
+          {/* Carousel card */}
           {currentReceipt && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-stretch bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
-              {/* Left: Receipt image */}
-              <div className="bg-slate-900 rounded-xl overflow-hidden flex flex-col justify-between p-2 relative aspect-[3/4] max-h-[520px]">
-                <div className="flex-1 flex items-center justify-center p-2 bg-slate-950 rounded-lg overflow-hidden">
-                  <img src={currentReceipt.imageUrl} alt="Receipt" className="max-h-full max-w-full object-contain" />
-                </div>
-                <div className="absolute top-4 right-4 flex items-center space-x-2">
-                  {currentReceipt.confidenceScore != null && (
-                    <span className={`text-[10px] font-bold px-2 py-1 rounded ${currentReceipt.confidenceScore >= 0.8 ? 'bg-emerald-500/20 text-emerald-300' : 'bg-amber-500/20 text-amber-300'}`}>
-                      {(currentReceipt.confidenceScore * 100).toFixed(0)}%
-                    </span>
-                  )}
-                </div>
-              </div>
+            <div className="relative">
+              <Carousel
+                className="w-full"
+                opts={{ startIndex: currentIdx, loop: false }}
+                setApi={(api) => {
+                  api?.on('select', () => {
+                    const idx = api.selectedScrollSnap();
+                    setCurrentIdx(idx);
+                    loadReceipt(queue[idx]);
+                  });
+                }}
+              >
+                <CarouselContent>
+                  {queue.map((rc, i) => (
+                    <CarouselItem key={rc.id}>
+                      <div className={`grid grid-cols-1 lg:grid-cols-2 gap-5 bg-white rounded-2xl border border-slate-100 shadow-sm p-5 overflow-hidden ${i === currentIdx ? '' : 'pointer-events-none'}`}>
+                        {/* Receipt image */}
+                        <div className="relative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950 rounded-xl overflow-hidden flex items-center justify-center min-h-[380px] max-h-[560px]">
+                          <img
+                            src={rc.imageUrl}
+                            alt="Receipt"
+                            className="max-h-full max-w-full object-contain p-3 select-none"
+                            draggable={false}
+                          />
+                          <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(0,0,0,0.4))]" />
+                          {rc.confidenceScore != null && (
+                            <div className="absolute top-3 right-3">
+                              <span className={`text-[11px] font-bold px-2.5 py-1 rounded-full backdrop-blur-sm ${
+                                rc.confidenceScore >= 0.8
+                                  ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                                  : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                              }`}>
+                                {(rc.confidenceScore * 100).toFixed(0)}% match
+                              </span>
+                            </div>
+                          )}
+                        </div>
 
-              {/* Right: Editable form + actions */}
-              <div className="flex flex-col justify-between space-y-4">
-                <div className="space-y-4">
-                  <div>
-                    <h3 className="font-bold text-slate-900 text-md">{t('soldGasApproveTitle')}</h3>
-                    <p className="text-xs text-slate-400">{t('soldGasApproveDesc')}</p>
-                  </div>
+                        {/* Form (only interactive on current slide) */}
+                        <div className="flex flex-col justify-between space-y-4">
+                          <div className="space-y-4">
+                            <div>
+                              <h3 className="font-bold text-slate-900">{t('soldGasApproveTitle')}</h3>
+                              <p className="text-xs text-slate-400">{t('soldGasApproveDesc')}</p>
+                            </div>
 
-                  {currentReceipt.extractedRawText && (
-                    <div className="bg-slate-50 rounded-lg p-2 max-h-20 overflow-y-auto border border-slate-100">
-                      <p className="text-[10px] text-slate-400 font-mono whitespace-pre-wrap line-clamp-3">{currentReceipt.extractedRawText}</p>
-                    </div>
-                  )}
+                            {rc.extractedRawText && (
+                              <div className="bg-slate-50 rounded-xl p-3 max-h-24 overflow-y-auto border border-slate-100">
+                                <p className="text-[11px] text-slate-400 font-mono whitespace-pre-wrap leading-relaxed">{rc.extractedRawText}</p>
+                              </div>
+                            )}
 
-                  <div className="space-y-3 font-medium text-slate-800 text-sm">
-                    <div>
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">{t('vendor')}</span>
-                      <select value={vVendorId} onChange={(e) => setVVendorId(e.target.value)} className="w-full border rounded-lg px-3 py-1.5 text-sm">
-                        <option value="">{t('unassigned')}</option>
-                        {vendors.map((v) => <option key={v.id} value={v.id}>{v.name}</option>)}
-                      </select>
-                    </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">{t('verifyAmount')}</span>
-                        <input type="number" step="0.01" min="0" value={vAmount} onChange={(e) => setVAmount(e.target.value)} className="w-full border rounded-lg px-3 py-1.5 text-sm" />
+                            <div className="space-y-3.5">
+                              <div>
+                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1.5">{t('vendor')}</label>
+                                <select value={i === currentIdx ? vVendorId : ''} onChange={(e) => i === currentIdx && setVVendorId(e.target.value)} disabled={i !== currentIdx} className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm font-medium text-slate-800 bg-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                                  <option value="">{t('unassigned')}</option>
+                                  {vendors.map((v) => <option key={v.id} value={v.id}>{v.name}</option>)}
+                                </select>
+                              </div>
+                              <div className="grid grid-cols-3 gap-3">
+                                <div>
+                                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1.5">Fuel</label>
+                                  <select value={i === currentIdx ? vFuelType : ''} onChange={(e) => i === currentIdx && setVFuelType(e.target.value)} disabled={i !== currentIdx} className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm font-medium text-slate-800 bg-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                                    <option value="gasoil">Gasoil</option>
+                                    <option value="essence">Essence</option>
+                                    <option value="other">Other</option>
+                                  </select>
+                                </div>
+                                <div>
+                                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1.5">{t('verifyAmount')}</label>
+                                  <input type="number" step="0.01" min="0" value={i === currentIdx ? vAmount : ''} onChange={(e) => i === currentIdx && setVAmount(e.target.value)} disabled={i !== currentIdx} className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm font-medium text-slate-800 bg-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all disabled:opacity-50" />
+                                </div>
+                                <div>
+                                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1.5">{t('receiptDate')}</label>
+                                  <input type="date" value={i === currentIdx ? vDate : ''} onChange={(e) => i === currentIdx && setVDate(e.target.value)} disabled={i !== currentIdx} className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm font-medium text-slate-800 bg-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all disabled:opacity-50" />
+                                </div>
+                              </div>
+                              <div>
+                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1.5">{t('notesRemarks')}</label>
+                                <textarea rows={2} value={i === currentIdx ? vDescription : ''} onChange={(e) => i === currentIdx && setVDescription(e.target.value)} disabled={i !== currentIdx} className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm font-medium text-slate-800 bg-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all resize-none disabled:opacity-50" />
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="pt-4 border-t border-slate-100 flex space-x-3">
+                            <button
+                              onClick={() => handleAction('rejected')}
+                              disabled={submitting || i !== currentIdx}
+                              className="flex-1 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl text-sm font-bold transition-all flex items-center justify-center space-x-2 border border-red-100 hover:border-red-200 disabled:opacity-30 disabled:cursor-not-allowed"
+                            >
+                              <Ban className="h-4 w-4" />
+                              <span>{t('reject')}</span>
+                            </button>
+                            <button
+                              onClick={() => handleAction('confirmed')}
+                              disabled={submitting || i !== currentIdx}
+                              className="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-bold shadow-lg shadow-emerald-600/20 transition-all flex items-center justify-center space-x-2 disabled:opacity-30 disabled:cursor-not-allowed"
+                            >
+                              {submitting ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+                              <span>{t('approveSoldGas')}</span>
+                            </button>
+                          </div>
+                        </div>
                       </div>
-                      <div>
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">{t('receiptDate')}</span>
-                        <input type="date" value={vDate} onChange={(e) => setVDate(e.target.value)} className="w-full border rounded-lg px-3 py-1.5 text-sm" />
-                      </div>
-                    </div>
-                    <div>
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">{t('notesRemarks')}</span>
-                      <textarea rows="2" value={vDescription} onChange={(e) => setVDescription(e.target.value)} className="w-full border rounded-lg px-3 py-1.5 text-sm" />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="pt-4 border-t border-slate-100 flex space-x-2">
-                  <button
-                    onClick={() => handleAction('rejected')}
-                    disabled={submitting}
-                    className="flex-1 py-2.5 bg-red-50 hover:bg-red-100 text-red-700 rounded-lg text-xs font-bold transition-all flex items-center justify-center space-x-1.5"
-                  >
-                    <Ban className="h-4 w-4" />
-                    <span>{t('reject')}</span>
-                  </button>
-                  <button
-                    onClick={() => handleAction('confirmed')}
-                    disabled={submitting}
-                    className="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold shadow-md transition-all flex items-center justify-center space-x-1.5"
-                  >
-                    {submitting ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
-                    <span>{t('approveSoldGas')}</span>
-                    <ChevronRight className="h-4 w-4" />
-                  </button>
-                </div>
-              </div>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                <CarouselPrevious className="hidden lg:flex -left-4 bg-white border-slate-200 shadow-lg hover:bg-slate-50 text-slate-600" />
+                <CarouselNext className="hidden lg:flex -right-4 bg-white border-slate-200 shadow-lg hover:bg-slate-50 text-slate-600" />
+              </Carousel>
             </div>
           )}
 
-          {/* Thumbnails nav */}
+          {/* Thumbnail navigation */}
           {queue.length > 1 && (
-            <div className="flex gap-2 overflow-x-auto pb-2">
-              {queue.map((rc, i) => (
-                <button
-                  key={rc.id}
-                  onClick={() => { setCurrentIdx(i); loadReceipt(rc); }}
-                  className={`shrink-0 w-14 h-14 rounded-lg overflow-hidden border-2 transition-all ${i === currentIdx ? 'border-emerald-600 ring-2 ring-emerald-200' : 'border-slate-200 opacity-60 hover:opacity-100'}`}
-                >
-                  <img src={rc.imageUrl} alt="thumb" className="h-full w-full object-cover" />
-                </button>
-              ))}
+            <div className="relative">
+              <div
+                ref={thumbRef}
+                className="flex gap-2 overflow-x-auto pb-1 scroll-smooth snap-x snap-mandatory scrollbar-hide"
+                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+              >
+                {queue.map((rc, i) => (
+                  <button
+                    key={rc.id}
+                    onClick={() => { setCurrentIdx(i); loadReceipt(rc); }}
+                    className={`snap-start shrink-0 w-14 h-14 rounded-xl overflow-hidden border-2 transition-all duration-200 ${
+                      i === currentIdx
+                        ? 'border-emerald-600 ring-2 ring-emerald-200 shadow-md scale-105'
+                        : 'border-slate-200 opacity-60 hover:opacity-100 hover:border-slate-300'
+                    }`}
+                  >
+                    <img src={rc.imageUrl} alt={`Receipt ${i + 1}`} className="h-full w-full object-cover" />
+                  </button>
+                ))}
+              </div>
             </div>
           )}
         </div>

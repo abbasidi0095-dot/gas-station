@@ -48,6 +48,7 @@ async function getExportData({ startDate, endDate, exportType, vendorId, categor
   if (exportType === 'combined' || exportType === 'revenue') {
     revenues = await prisma.revenue.findMany({
       where: revenueWhere,
+      include: { vendor: true },
       orderBy: { date: 'asc' },
     });
   }
