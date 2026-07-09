@@ -170,7 +170,7 @@ export default function SoldGas() {
         </div>
       ) : queue.length === 0 ? (
         <div className="max-w-lg mx-auto text-center py-16 bg-white dark:bg-slate-800/80 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm">
-          <div className="p-4 bg-emerald-50 rounded-full text-emerald-500 inline-flex mb-4">
+          <div className="p-4 bg-emerald-50 dark:bg-emerald-900/30 rounded-full text-emerald-500 inline-flex mb-4">
             <Fuel className="h-10 w-10" />
           </div>
           <h3 className="font-bold text-slate-900 dark:text-slate-50 text-lg">{t('soldGasQueueClear')}</h3>
@@ -185,16 +185,16 @@ export default function SoldGas() {
               <div className="flex items-baseline space-x-1">
                 <span className="text-lg font-black text-slate-900 dark:text-slate-50">{currentIdx + 1}</span>
                 <span className="text-sm text-slate-400 dark:text-slate-500">/</span>
-                <span className="text-sm font-semibold text-slate-600">{queue.length}</span>
+                <span className="text-sm font-semibold text-slate-600 dark:text-slate-300">{queue.length}</span>
               </div>
             </div>
-            <div className="flex-1 mx-5 h-2 bg-slate-100 rounded-full overflow-hidden">
+            <div className="flex-1 mx-5 h-2 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
               <div
                 className="h-full bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full transition-all duration-500 ease-out"
                 style={{ width: `${((currentIdx + 1) / queue.length) * 100}%` }}
               />
             </div>
-            <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg">
+            <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-2.5 py-1 rounded-lg">
               {Math.round(((currentIdx + 1) / queue.length) * 100)}%
             </span>
           </div>
@@ -290,7 +290,7 @@ export default function SoldGas() {
                             <button
                               onClick={() => handleAction('rejected')}
                               disabled={submitting || i !== currentIdx}
-                              className="flex-1 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl text-sm font-bold transition-all flex items-center justify-center space-x-2 border border-red-100 hover:border-red-200 disabled:opacity-30 disabled:cursor-not-allowed"
+                              className="flex-1 py-2.5 bg-red-50 dark:bg-red-900/30 hover:bg-red-100 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400 rounded-xl text-sm font-bold transition-all flex items-center justify-center space-x-2 border border-red-100 dark:border-red-800/50 hover:border-red-200 disabled:opacity-30 disabled:cursor-not-allowed"
                             >
                               <Ban className="h-4 w-4" />
                               <span>{t('reject')}</span>

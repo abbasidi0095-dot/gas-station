@@ -123,7 +123,7 @@ export default function Workers() {
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm text-left">
-                  <thead className="bg-slate-100 text-slate-500 dark:text-slate-400 uppercase text-[10px] font-bold tracking-wider">
+                  <thead className="bg-slate-100 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 uppercase text-[10px] font-bold tracking-wider">
                     <tr>
                       <th className="px-5 py-3">{t('name')}</th>
                       <th className="px-5 py-3">{t('cin')}</th>
@@ -137,16 +137,16 @@ export default function Workers() {
                     {workers.map((w) => (
                       <tr key={w.id} className="hover:bg-slate-50 dark:bg-slate-800/50 dark:hover:bg-slate-700/30">
                         <td className="px-5 py-3.5 font-bold text-slate-900 dark:text-slate-50">{w.name}</td>
-                        <td className="px-5 py-3.5"><span className="inline-flex items-center space-x-1 text-slate-600"><BadgeCheck className="h-3.5 w-3.5 text-indigo-400" />{w.cin}</span></td>
+                        <td className="px-5 py-3.5"><span className="inline-flex items-center space-x-1 text-slate-600 dark:text-slate-400"><BadgeCheck className="h-3.5 w-3.5 text-indigo-400" />{w.cin}</span></td>
                         <td className="px-5 py-3.5">{w.position === 'Pump Attendant' ? t('pumpAttendant') : w.position === 'Cashier' ? t('cashier') : w.position === 'Technician' ? t('technician') : w.position}</td>
                         <td className="px-5 py-3.5 text-slate-500 dark:text-slate-400">{w.phone}</td>
                         <td className="px-5 py-3.5">
-                          <button onClick={() => handleToggleStatus(w)} className={`inline-flex px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${w.active ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-600'}`}>
+                          <button onClick={() => handleToggleStatus(w)} className={`inline-flex px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${w.active ? 'bg-emerald-100 dark:bg-emerald-800/60 text-emerald-800 dark:text-emerald-200' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300'}`}>
                             {w.active ? t('active') : t('inactive')}
                           </button>
                         </td>
                         <td className="px-5 py-3.5 text-right">
-                          <button onClick={() => launchEditWorker(w)} className="p-1 hover:bg-slate-200 text-slate-500 dark:text-slate-400 rounded transition-colors"><Edit2 className="h-4 w-4" /></button>
+                          <button onClick={() => launchEditWorker(w)} className="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 rounded transition-colors"><Edit2 className="h-4 w-4" /></button>
                         </td>
                       </tr>
                     ))}
@@ -173,7 +173,7 @@ export default function Workers() {
                         <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">{new Date(p.date).toLocaleDateString()} &bull; {(p.amount || 0).toFixed(2)} MAD / DH</p>
                         {p.description && <p className="text-xs text-slate-400 italic">"{p.description}"</p>}
                       </div>
-                      <button onClick={() => handleDeletePayment(p.id)} className="p-1 hover:bg-red-50 text-red-500 rounded transition-all"><Trash2 className="h-4 w-4" /></button>
+                      <button onClick={() => handleDeletePayment(p.id)} className="p-1 hover:bg-red-50 dark:hover:bg-red-900/30 text-red-500 rounded transition-all"><Trash2 className="h-4 w-4" /></button>
                     </div>
                   ))
                 )}

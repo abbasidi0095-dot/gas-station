@@ -235,18 +235,18 @@ export default function Financials() {
                 ) : (
                   charges.map((item) => (
                     <tr key={item.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-700/30">
-                      <td className="px-5 py-3.5 font-bold text-slate-900">{new Date(item.date).toLocaleDateString()}</td>
+                      <td className="px-5 py-3.5 font-bold text-slate-900 dark:text-slate-50">{new Date(item.date).toLocaleDateString()}</td>
                       <td className="px-5 py-3.5 font-semibold text-slate-800 dark:text-slate-200">{item.vendor ? item.vendor.name : <span className="text-slate-400 dark:text-slate-500">—</span>}</td>
                       <td className="px-5 py-3.5">{catLabel(item.category)}</td>
                       <td className="px-5 py-3.5 text-slate-500 dark:text-slate-400 max-w-xs truncate" title={item.description}>{item.description || '—'}</td>
                       <td className="px-5 py-3.5">
                         {item.receiptId ? (
-                          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700">{t('ocrScan')}</span>
+                          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-50 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300">{t('ocrScan')}</span>
                         ) : (
-                          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-600">{t('manual')}</span>
+                          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">{t('manual')}</span>
                         )}
                       </td>
-                      <td className="px-5 py-3.5 text-right font-bold text-red-600">-{(item.amount || 0).toFixed(2)}</td>
+                      <td className="px-5 py-3.5 text-right font-bold text-red-600 dark:text-red-400">-{(item.amount || 0).toFixed(2)}</td>
                       <td className="px-5 py-3.5 text-right space-x-1">
                         <button onClick={() => handleLaunchEdit(item)} className="p-1 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:text-slate-300 rounded transition-all inline-block"><Edit3 className="h-4 w-4" /></button>
                         <button onClick={() => handleDeleteEntry(item.id)} className="p-1 hover:bg-red-50 text-slate-400 dark:text-slate-500 hover:text-red-600 rounded transition-all inline-block"><Trash2 className="h-4 w-4" /></button>
@@ -260,13 +260,13 @@ export default function Financials() {
                 ) : (
                   revenue.map((item) => (
                     <tr key={item.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-700/30">
-                      <td className="px-5 py-3.5 font-bold text-slate-900">{new Date(item.date).toLocaleDateString()}</td>
+                      <td className="px-5 py-3.5 font-bold text-slate-900 dark:text-slate-50">{new Date(item.date).toLocaleDateString()}</td>
                       <td className="px-5 py-3.5">{catLabel(item.category)}</td>
                       <td className="px-5 py-3.5 text-slate-500 dark:text-slate-400 max-w-xs truncate" title={item.description}>{item.description || '—'}</td>
                       <td className="px-5 py-3.5">
-                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700">{t('salesInflow')}</span>
+                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-50 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300">{t('salesInflow')}</span>
                       </td>
-                      <td className="px-5 py-3.5 text-right font-bold text-emerald-600">+{(item.amount || 0).toFixed(2)}</td>
+                      <td className="px-5 py-3.5 text-right font-bold text-emerald-600 dark:text-emerald-400">+{(item.amount || 0).toFixed(2)}</td>
                       <td className="px-5 py-3.5 text-right space-x-1">
                         <button onClick={() => handleLaunchEdit(item)} className="p-1 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:text-slate-300 rounded transition-all inline-block"><Edit3 className="h-4 w-4" /></button>
                         <button onClick={() => handleDeleteEntry(item.id)} className="p-1 hover:bg-red-50 text-slate-400 dark:text-slate-500 hover:text-red-600 rounded transition-all inline-block"><Trash2 className="h-4 w-4" /></button>
@@ -285,7 +285,7 @@ export default function Financials() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm">
           <form onSubmit={handleSubmitForm} className="bg-white dark:bg-slate-800/80 rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border">
             <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-700/50 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
-              <h3 className="font-bold text-slate-900 text-md">{editingItem ? t('editEntry') : activeTab === 'charges' ? t('recordCharge') : t('logRevenueStream')}</h3>
+              <h3 className="font-bold text-slate-900 dark:text-slate-50 text-md">{editingItem ? t('editEntry') : activeTab === 'charges' ? t('recordCharge') : t('logRevenueStream')}</h3>
               <button type="button" onClick={() => setModalOpen(false)} className="p-1 text-slate-400 dark:text-slate-500 hover:text-slate-600"><X className="h-5 w-5" /></button>
             </div>
             <div className="p-6 space-y-4">

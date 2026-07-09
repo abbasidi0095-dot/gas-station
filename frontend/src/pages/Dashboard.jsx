@@ -75,15 +75,15 @@ export default function Dashboard() {
 
       {/* Review banner */}
       {pendingCount > 0 && (
-        <div onClick={() => navigate('/review-queue')} className="p-4 bg-amber-50 hover:bg-amber-100/70 border border-amber-200 text-amber-900 rounded-2xl flex items-center justify-between cursor-pointer transition-all shadow-sm dark:shadow-slate-900/50">
+        <div onClick={() => navigate('/review-queue')} className="p-4 bg-amber-50 dark:bg-amber-900/20 hover:bg-amber-100/70 dark:hover:bg-amber-900/30 border border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-200 rounded-2xl flex items-center justify-between cursor-pointer transition-all shadow-sm dark:shadow-slate-900/50">
           <div className="flex items-center space-x-3">
-            <div className="p-2 bg-amber-100 rounded-xl text-amber-700 animate-bounce"><AlertOctagon className="h-5 w-5" /></div>
+            <div className="p-2 bg-amber-100 dark:bg-amber-900/50 rounded-xl text-amber-700 dark:text-amber-400 animate-bounce"><AlertOctagon className="h-5 w-5" /></div>
             <div>
               <p className="text-sm font-bold text-slate-900 dark:text-slate-50">{t('reviewRequired')}</p>
-              <p className="text-xs text-slate-600">{t('reviewRequiredDesc', { n: pendingCount })}</p>
+              <p className="text-xs text-slate-600 dark:text-slate-400">{t('reviewRequiredDesc', { n: pendingCount })}</p>
             </div>
           </div>
-          <span className="text-xs font-bold text-indigo-600 underline">{t('resolveQueue')}</span>
+          <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 underline">{t('resolveQueue')}</span>
         </div>
       )}
 
@@ -95,7 +95,7 @@ export default function Dashboard() {
             { label: t('monthView'), val: 'month' },
             { label: t('yearView'), val: 'year' }
           ].map((item) => (
-            <button key={item.val} onClick={() => setRange(item.val)} className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${range === item.val ? 'bg-slate-900 text-white shadow-sm dark:shadow-slate-900/50' : 'text-slate-600 hover:bg-slate-100'}`}>
+            <button key={item.val} onClick={() => setRange(item.val)} className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${range === item.val ? 'bg-slate-900 text-white shadow-sm dark:shadow-slate-900/50' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'}`}>
               {item.label}
             </button>
           ))}
@@ -111,9 +111,9 @@ export default function Dashboard() {
           <span className="text-sm font-semibold text-slate-500 dark:text-slate-400">{t('aggregating')}</span>
         </div>
       ) : error ? (
-        <div className="bg-red-50 p-6 rounded-2xl text-center max-w-md mx-auto">
-          <p className="text-red-800 font-bold mb-2">{t('failedDashboard')}</p>
-          <p className="text-xs text-red-600 mb-4">{error}</p>
+        <div className="bg-red-50 dark:bg-red-900/20 p-6 rounded-2xl text-center max-w-md mx-auto">
+          <p className="text-red-800 dark:text-red-300 font-bold mb-2">{t('failedDashboard')}</p>
+          <p className="text-xs text-red-600 dark:text-red-400 mb-4">{error}</p>
           <button onClick={fetchDashboardData} className="px-4 py-2 bg-red-600 text-white font-semibold rounded-lg text-xs">{t('retryConnection')}</button>
         </div>
       ) : data ? (
@@ -124,25 +124,25 @@ export default function Dashboard() {
               <div className="space-y-2">
                 <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">{t('totalRevenue')}</span>
                 <h3 className="text-3xl font-black text-slate-900 dark:text-slate-50">{data.summary.totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2 })} <span className="text-xs font-semibold text-slate-400 dark:text-slate-500">MAD / DH</span></h3>
-                <span className="inline-flex items-center text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded"><TrendingUp className="h-3 w-3 mr-1" /><span>{t('receiptsSales')}</span></span>
+                <span className="inline-flex items-center text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-2 py-0.5 rounded"><TrendingUp className="h-3 w-3 mr-1" /><span>{t('receiptsSales')}</span></span>
               </div>
-              <div className="p-3 bg-emerald-50 rounded-xl text-emerald-600"><TrendingUp className="h-6 w-6" /></div>
+              <div className="p-3 bg-emerald-50 dark:bg-emerald-900/30 rounded-xl text-emerald-600 dark:text-emerald-400"><TrendingUp className="h-6 w-6" /></div>
             </div>
             <div className="bg-white dark:bg-slate-800/80 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm dark:shadow-slate-900/50 flex items-start justify-between">
               <div className="space-y-2">
                 <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">{t('totalSpend')}</span>
                 <h3 className="text-3xl font-black text-slate-900 dark:text-slate-50">{data.summary.totalCharges.toLocaleString(undefined, { minimumFractionDigits: 2 })} <span className="text-xs font-semibold text-slate-400 dark:text-slate-500">MAD / DH</span></h3>
-                <span className="inline-flex items-center text-xs font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded"><TrendingDown className="h-3 w-3 mr-1" /><span>{t('chargesLogistics')}</span></span>
+                <span className="inline-flex items-center text-xs font-bold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30 px-2 py-0.5 rounded"><TrendingDown className="h-3 w-3 mr-1" /><span>{t('chargesLogistics')}</span></span>
               </div>
-              <div className="p-3 bg-red-50 rounded-xl text-red-600"><TrendingDown className="h-6 w-6" /></div>
+              <div className="p-3 bg-red-50 dark:bg-red-900/30 rounded-xl text-red-600 dark:text-red-400"><TrendingDown className="h-6 w-6" /></div>
             </div>
             <div className="bg-white dark:bg-slate-800/80 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm dark:shadow-slate-900/50 flex items-start justify-between">
               <div className="space-y-2">
                 <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">{t('netProfit')}</span>
                 <h3 className={`text-3xl font-black ${data.summary.netProfit >= 0 ? 'text-slate-900 dark:text-slate-50' : 'text-red-700'}`}>{data.summary.netProfit.toLocaleString(undefined, { minimumFractionDigits: 2 })} <span className="text-xs font-semibold text-slate-400 dark:text-slate-500">MAD / DH</span></h3>
-                <span className={`inline-flex items-center text-xs font-bold px-2 py-0.5 rounded ${data.summary.netProfit >= 0 ? 'bg-indigo-50 text-indigo-700' : 'bg-red-50 text-red-700'}`}><Landmark className="h-3 w-3 mr-1" /><span>{data.summary.netProfit >= 0 ? t('surplus') : t('deficit')}</span></span>
+                <span className={`inline-flex items-center text-xs font-bold px-2 py-0.5 rounded ${data.summary.netProfit >= 0 ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300' : 'bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300'}`}><Landmark className="h-3 w-3 mr-1" /><span>{data.summary.netProfit >= 0 ? t('surplus') : t('deficit')}</span></span>
               </div>
-              <div className={`p-3 rounded-xl ${data.summary.netProfit >= 0 ? 'bg-indigo-50 text-indigo-600' : 'bg-red-50 text-red-600'}`}><Landmark className="h-6 w-6" /></div>
+              <div className={`p-3 rounded-xl ${data.summary.netProfit >= 0 ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400' : 'bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400'}`}><Landmark className="h-6 w-6" /></div>
             </div>
           </div>
 
@@ -193,7 +193,7 @@ export default function Dashboard() {
                           <span className="font-semibold text-slate-700 dark:text-slate-300">{item.name}</span>
                           <span className="font-bold text-slate-900 dark:text-slate-50">{item.value.toLocaleString(undefined, { minimumFractionDigits: 0 })} MAD / DH</span>
                         </div>
-                        <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                        <div className="h-2 w-full bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
                           <div className="h-full rounded-full" style={{ width: `${pct}%`, backgroundColor: COLORS[index % COLORS.length] }} />
                         </div>
                         <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold">{pct}%</span>
@@ -220,8 +220,8 @@ export default function Dashboard() {
                     <div className="flex-1 space-y-2 text-xs">
                       {data.revenueCategories.map((item, i) => (
                         <div key={item.name} className="flex items-center justify-between font-medium">
-                          <div className="flex items-center space-x-2"><div className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: COLORS[i % COLORS.length] }} /><span className="text-slate-600 capitalize">{catLabel(item.name)}</span></div>
-                          <span className="font-bold text-slate-800">{item.value.toLocaleString()} MAD / DH</span>
+                          <div className="flex items-center space-x-2"><div className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: COLORS[i % COLORS.length] }} /><span className="text-slate-600 dark:text-slate-400 capitalize">{catLabel(item.name)}</span></div>
+                          <span className="font-bold text-slate-800 dark:text-slate-200">{item.value.toLocaleString()} MAD / DH</span>
                         </div>
                       ))}
                     </div>
@@ -246,8 +246,8 @@ export default function Dashboard() {
                     <div className="flex-1 space-y-2 text-xs">
                       {data.expenseCategories.map((item, i) => (
                         <div key={item.name} className="flex items-center justify-between font-medium">
-                          <div className="flex items-center space-x-2"><div className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: COLORS[i % COLORS.length] }} /><span className="text-slate-600">{catLabel(item.name)}</span></div>
-                          <span className="font-bold text-slate-800">{item.value.toLocaleString()} MAD / DH</span>
+                          <div className="flex items-center space-x-2"><div className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: COLORS[i % COLORS.length] }} /><span className="text-slate-600 dark:text-slate-400">{catLabel(item.name)}</span></div>
+                          <span className="font-bold text-slate-800 dark:text-slate-200">{item.value.toLocaleString()} MAD / DH</span>
                         </div>
                       ))}
                     </div>
@@ -285,7 +285,7 @@ export default function Dashboard() {
                         <td className="px-5 py-3 font-bold text-slate-900 dark:text-slate-50">{new Date(item.date).toLocaleDateString()}</td>
                         <td className="px-5 py-3 font-semibold text-slate-800 dark:text-slate-200">{item.vendor ? item.vendor.name : <span className="text-slate-400 dark:text-slate-500">—</span>}</td>
                         <td className="px-5 py-3">{catLabel(item.category)}</td>
-                        <td className="px-5 py-3 text-right font-bold text-red-600">-{(item.amount || 0).toFixed(2)}</td>
+                        <td className="px-5 py-3 text-right font-bold text-red-600 dark:text-red-400">-{(item.amount || 0).toFixed(2)}</td>
                       </tr>
                     ))
                   )}

@@ -58,20 +58,20 @@ export default function ReviewQueue() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-black text-slate-900 tracking-tight">{t('reviewQueueTitle')}</h2>
-        <p className="text-sm text-slate-500">{t('reviewQueueDesc')}</p>
+        <h2 className="text-2xl font-black text-slate-900 dark:text-slate-50 tracking-tight">{t('reviewQueueTitle')}</h2>
+        <p className="text-sm text-slate-500 dark:text-slate-400">{t('reviewQueueDesc')}</p>
       </div>
 
       {loading ? (
         <div className="w-full py-12 flex justify-center space-x-2">
-          <RefreshCw className="h-5 w-5 text-indigo-500 animate-spin" />
-          <span className="text-sm text-slate-500">{t('loadingQueue')}</span>
+          <RefreshCw className="h-5 w-5 text-indigo-500 dark:text-indigo-400 animate-spin" />
+          <span className="text-sm text-slate-500 dark:text-slate-400">{t('loadingQueue')}</span>
         </div>
       ) : queue.length === 0 ? (
         <div className="max-w-md mx-auto text-center py-16 bg-white dark:bg-slate-800/80 rounded-2xl border border-slate-100 dark:border-slate-700/50 p-8 shadow-sm">
-          <div className="p-3 bg-indigo-50 rounded-full text-indigo-600 max-w-fit mx-auto mb-4"><ClipboardCheck className="h-10 w-10 animate-bounce" /></div>
-          <h3 className="font-bold text-slate-900 text-lg">{t('queueClear')}</h3>
-          <p className="text-sm text-slate-500 mt-2">{t('queueClearDesc')}</p>
+          <div className="p-3 bg-indigo-50 dark:bg-indigo-900/30 rounded-full text-indigo-600 dark:text-indigo-400 max-w-fit mx-auto mb-4"><ClipboardCheck className="h-10 w-10 animate-bounce" /></div>
+          <h3 className="font-bold text-slate-900 dark:text-slate-50 text-lg">{t('queueClear')}</h3>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">{t('queueClearDesc')}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 items-stretch">
@@ -83,8 +83,8 @@ export default function ReviewQueue() {
                 return (
                   <div key={rc.id} onClick={() => selectReceiptForReview(rc)} className={`p-4 cursor-pointer transition-all ${isSelected ? 'bg-indigo-50/50 dark:bg-indigo-900/30 border-l-4 border-indigo-600' : 'hover:bg-slate-50 dark:hover:bg-slate-700/50 dark:bg-slate-800/50'}`}>
                     <div className="flex justify-between items-start">
-                      <h4 className="font-bold text-sm text-slate-900 truncate max-w-[150px]">{rc.vendor ? rc.vendor.name : t('unknownVendor')}</h4>
-                      <span className="text-[10px] font-bold text-indigo-600 bg-indigo-100 px-2 py-0.5 rounded">{(((rc.confidenceScore ?? 0) * 100).toFixed(0))}{t('matchPct')}</span>
+                      <h4 className="font-bold text-sm text-slate-900 dark:text-slate-50 truncate max-w-[150px]">{rc.vendor ? rc.vendor.name : t('unknownVendor')}</h4>
+                      <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-300 bg-indigo-100 dark:bg-indigo-900/50 px-2 py-0.5 rounded">{(((rc.confidenceScore ?? 0) * 100).toFixed(0))}{t('matchPct')}</span>
                     </div>
                     <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">{t('uploaded')}: {new Date(rc.scannedAt).toLocaleString()}</p>
                     <p className="text-sm font-bold text-slate-800 dark:text-slate-200 mt-2">{rc.amount != null ? `${rc.amount.toFixed(2)} ${rc.currency || 'MAD / DH'}` : t('amountNA')}</p>
@@ -106,35 +106,35 @@ export default function ReviewQueue() {
               <div className="flex flex-col justify-between space-y-4">
                 <div className="space-y-4">
                   <div>
-                    <h3 className="font-bold text-slate-900 text-md">{t('auditForm')}</h3>
+                    <h3 className="font-bold text-slate-900 dark:text-slate-50 text-md">{t('auditForm')}</h3>
                     <p className="text-xs text-slate-400 dark:text-slate-500">{t('auditFormDesc')}</p>
                   </div>
                   <div className="space-y-3 font-medium text-slate-800 dark:text-slate-200 text-sm">
                     <div>
                       <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">{t('verifyAmount')}</span>
-                      <input type="number" step="0.01" min="0" value={amount} onChange={(e) => setAmount(e.target.value)} className="w-full border rounded-lg px-3 py-1.5 text-sm" />
+                      <input type="number" step="0.01" min="0" value={amount} onChange={(e) => setAmount(e.target.value)} className="w-full border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-1.5 text-sm bg-white dark:bg-slate-700/80 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all" />
                     </div>
                     <div>
                       <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">{t('assignVendor')}</span>
-                      <select value={vendorId} onChange={(e) => setVendorId(e.target.value)} className="w-full border rounded-lg px-3 py-1.5 text-sm">
+                      <select value={vendorId} onChange={(e) => setVendorId(e.target.value)} className="w-full border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-1.5 text-sm bg-white dark:bg-slate-700/80 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all">
                         <option value="">{t('unassigned')}</option>
                         {vendors.map(v => <option key={v.id} value={v.id}>{v.name}</option>)}
                       </select>
                     </div>
                     <div>
                       <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">{t('receiptDate')}</span>
-                      <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="w-full border rounded-lg px-3 py-1.5 text-sm" />
+                      <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="w-full border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-1.5 text-sm bg-white dark:bg-slate-700/80 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all" />
                     </div>
                     <div>
                       <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">{t('filingCategory')}</span>
-                      <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full border rounded-lg px-3 py-1.5 text-sm">
+                      <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-1.5 text-sm bg-white dark:bg-slate-700/80 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 dark:focus:border-indigo-400 transition-all">
                         {REVIEW_CATEGORIES.map(c => <option key={c} value={c}>{catLabel(c)}</option>)}
                       </select>
                     </div>
                   </div>
                 </div>
                 <div className="pt-4 border-t border-slate-100 dark:border-slate-700/50 flex space-x-2">
-                  <button onClick={() => handleReviewAction('rejected')} disabled={submitting} className="flex-1 py-2 bg-red-50 hover:bg-red-100 text-red-700 rounded-lg text-xs font-bold transition-all flex items-center justify-center space-x-1.5"><Ban className="h-4 w-4" /><span>{t('reject')}</span></button>
+                  <button onClick={() => handleReviewAction('rejected')} disabled={submitting} className="flex-1 py-2 bg-red-50 dark:bg-red-900/30 hover:bg-red-100 dark:hover:bg-red-900/50 text-red-700 dark:text-red-400 rounded-lg text-xs font-bold transition-all flex items-center justify-center space-x-1.5"><Ban className="h-4 w-4" /><span>{t('reject')}</span></button>
                   <button onClick={() => handleReviewAction('confirmed')} disabled={submitting} className="flex-1 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold shadow-md transition-all flex items-center justify-center space-x-1.5"><Check className="h-4 w-4" /><span>{t('approveLedger')}</span></button>
                 </div>
               </div>

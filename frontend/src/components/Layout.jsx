@@ -159,7 +159,7 @@ export default function Layout({ children }) {
   );
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-slate-50">
+    <div className="min-h-screen flex flex-col md:flex-row bg-slate-50 dark:bg-slate-950 transition-colors">
       <header className="md:hidden flex items-center justify-between px-4 py-3 bg-slate-900 border-b border-slate-800 text-white sticky top-0 z-30">
         <div className="flex items-center space-x-2">
           <AlMohitLogo className="h-7 w-7" variant="light" />
