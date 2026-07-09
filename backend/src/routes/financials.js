@@ -58,7 +58,7 @@ router.get('/charges', authenticate, isAdmin, async (req, res) => {
 });
 
 // POST /api/financials/charges
-router.post('/charges', authenticate, isAdmin, async (req, res) => {
+router.post('/charges', authenticate, async (req, res) => {
   const { vendorId, amount, category, date, description } = req.body;
 
   if (amount === undefined || !category || !date) {
@@ -66,6 +66,24 @@ router.post('/charges', authenticate, isAdmin, async (req, res) => {
   }
 
   try {
+    if (req.user.role === 'pompist') {
+      const receipt = await prisma.receipt.create({
+        data: {
+          imageUrl: '/uploads/manual-entry.png',
+          vendorId: vendorId || null,
+          amount: parseFloat(amount),
+          currency: 'MAD',
+          extractedRawText: description || `Saisie de charge par ${req.user.name}`,
+          confidenceScore: 1.0,
+          status: 'pending_review',
+          purpose: 'expense',
+          scannedBy: req.user.id,
+          date: date,
+        },
+      });
+      return res.status(201).json({ message: 'L\'opération de dépense a été soumise avec succès et est en attente de validation.', receipt });
+    }
+
     const charge = await prisma.$transaction(async (tx) => {
       const seq = await tx.sequence.upsert({
         where: { id: 'invoice_number' },
@@ -174,14 +192,32 @@ router.get('/revenue', authenticate, isAdmin, async (req, res) => {
 });
 
 // POST /api/financials/revenue
-router.post('/revenue', authenticate, isAdmin, async (req, res) => {
-  const { amount, category, date, description } = req.body;
+router.post('/revenue', authenticate, async (req, res) => {
+  const { amount, category, date, description, vendorId } = req.body;
 
   if (amount === undefined || !category || !date) {
     return res.status(400).json({ error: 'Amount, category, and date are required.' });
   }
 
   try {
+    if (req.user.role === 'pompist') {
+      const receipt = await prisma.receipt.create({
+        data: {
+          imageUrl: '/uploads/manual-entry.png',
+          vendorId: vendorId || null,
+          amount: parseFloat(amount),
+          currency: 'MAD',
+          extractedRawText: description || `Saisie de revenu par ${req.user.name}`,
+          confidenceScore: 1.0,
+          status: 'pending_review',
+          purpose: 'revenue',
+          scannedBy: req.user.id,
+          date: date,
+        },
+      });
+      return res.status(201).json({ message: 'L\'opération de recette a été soumise avec succès et est en attente de validation.', receipt });
+    }
+
     const rev = await prisma.revenue.create({
       data: {
         amount: parseFloat(amount),
@@ -189,6 +225,7 @@ router.post('/revenue', authenticate, isAdmin, async (req, res) => {
         date: new Date(date),
         description,
         createdBy: req.user.id,
+        vendorId: vendorId || null,
       },
     });
     return res.status(201).json({ message: 'Revenue entry logged successfully.', revenue: rev });

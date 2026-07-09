@@ -133,7 +133,7 @@ export default function Layout({ children }) {
 
   const navItems = user?.role === 'pompist'
     ? [
-        { name: "Saisie d'opérations", path: '/pompist', icon: DollarSign },
+        { name: t('financials'), path: '/financials', icon: DollarSign },
       ]
     : [
         { name: t('dashboard'), path: '/', icon: LayoutDashboard },

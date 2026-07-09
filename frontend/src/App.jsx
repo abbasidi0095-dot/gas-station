@@ -7,7 +7,6 @@ import Layout from './components/Layout.jsx';
 
 import Login from './pages/Login.jsx';
 import Dashboard from './pages/Dashboard.jsx';
-import PompistInput from './pages/PompistInput.jsx';
 import SoldGas from './pages/SoldGas.jsx';
 import Workers from './pages/Workers.jsx';
 import Financials from './pages/Financials.jsx';
@@ -34,7 +33,7 @@ function ProtectedRoute({ children, allowedRoles = ['admin'] }) {
 
   if (allowedRoles && !allowedRoles.includes(user.role)) {
     if (user.role === 'pompist') {
-      return <Navigate to="/pompist" replace />;
+      return <Navigate to="/financials" replace />;
     }
     return <Navigate to="/login" replace />;
   }
@@ -51,9 +50,8 @@ export default function App() {
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route path="/" element={<ProtectedRoute allowedRoles={['admin']}><Dashboard /></ProtectedRoute>} />
-              <Route path="/pompist" element={<ProtectedRoute allowedRoles={['pompist', 'admin']}><PompistInput /></ProtectedRoute>} />
               <Route path="/sold-gas" element={<ProtectedRoute allowedRoles={['admin']}><SoldGas /></ProtectedRoute>} />
-              <Route path="/financials" element={<ProtectedRoute allowedRoles={['admin']}><Financials /></ProtectedRoute>} />
+              <Route path="/financials" element={<ProtectedRoute allowedRoles={['pompist', 'admin']}><Financials /></ProtectedRoute>} />
               <Route path="/workers" element={<ProtectedRoute allowedRoles={['admin']}><Workers /></ProtectedRoute>} />
               <Route path="/review-queue" element={<ProtectedRoute allowedRoles={['admin']}><ReviewQueue /></ProtectedRoute>} />
               <Route path="/receipts" element={<ProtectedRoute allowedRoles={['admin']}><ReceiptHistory /></ProtectedRoute>} />
