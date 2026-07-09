@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useLanguage, languages } from '../context/LanguageContext.jsx';
-import { LayoutDashboard, DollarSign, Users, ClipboardCheck, LogOut, Menu, X, Fuel, Globe, ChevronDown, Receipt } from 'lucide-react';
+import { LayoutDashboard, DollarSign, Users, ClipboardCheck, LogOut, Menu, X, Globe, ChevronDown, Receipt } from 'lucide-react';
+import { AlMohitLogo, AlMohitLogoWide } from './AlMohitLogo.jsx';
 
 export default function Layout({ children }) {
   const { user, logout } = useAuth();
@@ -93,12 +94,9 @@ export default function Layout({ children }) {
   const sidebarContent = (
     <div className="flex flex-col h-full bg-slate-900 text-slate-100 p-4">
       <div className="flex items-center space-x-3 px-2 py-4 border-b border-slate-800">
-        <div className="p-2 bg-indigo-600 rounded-lg shadow-lg shadow-indigo-600/20">
-          <Fuel className="h-6 w-6 text-white" />
-        </div>
-        <div>
-          <h1 className="text-sm font-bold tracking-tight text-white leading-none">{t('brandName')}</h1>
-          <span className="text-xs text-indigo-400">{t('brandTagline')}</span>
+        <AlMohitLogo className="h-9 w-9 shrink-0" variant="light" />
+        <div className="min-w-0">
+          <AlMohitLogoWide className="h-6" variant="light" />
         </div>
       </div>
 
@@ -155,8 +153,8 @@ export default function Layout({ children }) {
     <div className="min-h-screen flex flex-col md:flex-row bg-slate-50">
       <header className="md:hidden flex items-center justify-between px-4 py-3 bg-slate-900 border-b border-slate-800 text-white sticky top-0 z-30">
         <div className="flex items-center space-x-2">
-          <Fuel className="h-6 w-6 text-indigo-500" />
-          <span className="font-bold tracking-tight text-sm">{t('brandName')}</span>
+          <AlMohitLogo className="h-7 w-7" variant="light" />
+          <span className="font-bold tracking-tight text-sm">Al Mohit</span>
         </div>
         <div className="flex items-center space-x-2">
           <select

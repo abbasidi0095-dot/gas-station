@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useLanguage, languages } from '../context/LanguageContext.jsx';
-import { Fuel, Key, Mail, AlertTriangle, Eye, EyeOff, Globe } from 'lucide-react';
+import { Key, Mail, AlertTriangle, Eye, EyeOff, Globe } from 'lucide-react';
+import { AlMohitLogo, AlMohitLogoWide } from '../components/AlMohitLogo.jsx';
 
 export default function Login() {
   const { login } = useAuth();
@@ -55,10 +56,8 @@ export default function Login() {
 
       <div className="max-w-md w-full bg-slate-950/40 backdrop-blur-md border border-slate-800 p-8 rounded-2xl shadow-2xl relative z-10 flex flex-col">
         <div className="flex flex-col items-center text-center mb-8">
-          <div className="p-3 bg-indigo-600 rounded-xl shadow-lg shadow-indigo-600/20 mb-4 text-white">
-            <Fuel className="h-8 w-8" />
-          </div>
-          <h2 className="text-xl font-bold tracking-tight text-white">{t('brandName')}</h2>
+          <AlMohitLogo className="h-14 w-14 mb-3" variant="light" />
+          <AlMohitLogoWide className="h-7" variant="light" />
           <p className="text-xs text-slate-400 mt-1.5 uppercase tracking-widest font-semibold">{t('loginSubtitle')}</p>
         </div>
 
