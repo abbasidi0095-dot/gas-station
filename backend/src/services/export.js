@@ -334,11 +334,24 @@ export async function generateExcelExport({ range, startDate, endDate, revenues,
 export function generatePDFExport({ range, startDate, endDate, revenues, charges, receipts, totals }) {
   return new Promise((resolve, reject) => {
     try {
-      const doc = new PDFDocument({ margin: 50, bufferPages: true });
+      const doc = new PDFDocument({ margin: 50 });
       const buffers = [];
 
       doc.on('data', (chunk) => buffers.push(chunk));
       doc.on('end', () => resolve(Buffer.concat(buffers)));
+
+      let pageNum = 1;
+
+      // Page 1 footer (pageAdded doesn't fire for the initial page)
+      doc.fillColor('#7F7F7F').fontSize(8).text(`Page 1 — Al Mohit Gas Station`, 56, 750, { align: 'center', width: 488 });
+      doc.y = 50;
+
+      doc.on('pageAdded', () => {
+        pageNum++;
+        const y = doc.y;
+        doc.fillColor('#7F7F7F').fontSize(8).text(`Page ${pageNum} — Al Mohit Gas Station`, 56, 750, { align: 'center', width: 488 });
+        doc.y = y;
+      });
 
       const formattedStart = new Date(startDate).toLocaleDateString();
       const formattedEnd = new Date(endDate).toLocaleDateString();
@@ -417,9 +430,8 @@ export function generatePDFExport({ range, startDate, endDate, revenues, charges
         doc.fillColor('#FFFFFF').fontSize(9).font('Helvetica-Bold');
         doc.text(`GRAND TOTAL — ${revenues.length} operations`, 55, y + 6);
         doc.text(`${grandTotal.toFixed(2)} MAD / DH`, 430, y + 6, { width: 120, align: 'right' });
-        doc.y = y + 30;
+        doc.y = Math.min(y + 30, doc.page.height - 100);
         doc.fillColor('#262626');
-        doc.moveDown(1);
       }
 
       // EXPENSES TABLE — all records
@@ -458,7 +470,7 @@ export function generatePDFExport({ range, startDate, endDate, revenues, charges
         doc.fillColor('#FFFFFF').fontSize(9).font('Helvetica-Bold');
         doc.text(`TOTAL EXPENSES — ${charges.length} entries`, 55, y + 6);
         doc.text(`${expTotal.toFixed(2)} MAD / DH`, 440, y + 6, { width: 120, align: 'right' });
-        doc.y = y + 30;
+        doc.y = Math.min(y + 30, doc.page.height - 100);
       }
 
       // PER-VENDOR REVENUE BREAKDOWN
@@ -528,22 +540,9 @@ export function generatePDFExport({ range, startDate, endDate, revenues, charges
           doc.fillColor('#FFFFFF').fontSize(9).font('Helvetica-Bold');
           doc.text(`${vName} TOTAL — ${vRevs.length} operations`, 55, y + 6);
           doc.text(`${vTotal.toFixed(2)} MAD / DH`, 430, y + 6, { width: 120, align: 'right' });
-          doc.y = y + 30;
+          doc.y = Math.min(y + 30, doc.page.height - 100);
           doc.fillColor('#262626');
-          doc.moveDown(1);
         }
-      }
-
-      // FOOTER / PAGE NUMBERING
-      const rangeOfPages = doc.bufferedPageRange();
-      for (let i = 0; i < rangeOfPages.count; i++) {
-        doc.switchToPage(i);
-        doc.fillColor('#7F7F7F').fontSize(8);
-        doc.text(
-          `Page ${i + 1} of ${rangeOfPages.count} — Al Mohit Gas Station`,
-          50, 750,
-          { align: 'center' }
-        );
       }
 
       doc.end();
