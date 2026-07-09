@@ -341,16 +341,20 @@ export function generatePDFExport({ range, startDate, endDate, revenues, charges
       doc.on('end', () => resolve(Buffer.concat(buffers)));
 
       let pageNum = 1;
+      let addingFooter = false;
 
       // Page 1 footer (pageAdded doesn't fire for the initial page)
-      doc.fillColor('#7F7F7F').fontSize(8).text(`Page 1 — Al Mohit Gas Station`, 56, 750, { align: 'center', width: 488 });
+      doc.fillColor('#7F7F7F').fontSize(8).text(`Page 1 — Al Mohit Gas Station`, 56, 732, { align: 'center', width: 488 });
       doc.y = 50;
 
       doc.on('pageAdded', () => {
+        if (addingFooter) return;
+        addingFooter = true;
         pageNum++;
         const y = doc.y;
-        doc.fillColor('#7F7F7F').fontSize(8).text(`Page ${pageNum} — Al Mohit Gas Station`, 56, 750, { align: 'center', width: 488 });
+        doc.fillColor('#7F7F7F').fontSize(8).text(`Page ${pageNum} — Al Mohit Gas Station`, 56, 732, { align: 'center', width: 488 });
         doc.y = y;
+        addingFooter = false;
       });
 
       const formattedStart = new Date(startDate).toLocaleDateString();
