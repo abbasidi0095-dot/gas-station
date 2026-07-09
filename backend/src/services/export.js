@@ -342,7 +342,7 @@ export async function generateExcelExport({ range, startDate, endDate, revenues,
 export async function generatePDFExport({ range, startDate, endDate, revenues, charges, receipts, totals }) {
   const [almohitPng, afriquiaPng] = await Promise.all([
     svgToPngBuffer('./assets/almohit-mark.svg', 40),
-    svgToPngBuffer('./assets/afriquia-logo.svg', 100),
+    svgToPngBuffer('./assets/afriquia-logo.svg', 55),
   ]);
 
   return new Promise((resolve, reject) => {
@@ -374,9 +374,9 @@ export async function generatePDFExport({ range, startDate, endDate, revenues, c
       const formattedEnd = new Date(endDate).toLocaleDateString();
 
       // Logo row — Al Mohit left, Afriquia right
-      doc.image(almohitPng, 50, 45, { width: 40 });
-      doc.image(afriquiaPng, 462, 45, { width: 100 });
-      doc.y = 93;
+      doc.image(almohitPng, 50, 50, { width: 40 });
+      doc.image(afriquiaPng, 462, 42, { width: 55 });
+      doc.y = 97;
 
       doc.fillColor('#1F4E78').fontSize(10).font('Helvetica-Bold').text('N HOLDING DAKHLA (AL MOHIT)', { align: 'center' });
       doc.fillColor('#1F4E78').fontSize(16).font('Helvetica-Bold').text('RELEVÉ DE LA STATION', { align: 'center' });
