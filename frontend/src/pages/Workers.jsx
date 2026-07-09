@@ -189,7 +189,7 @@ export default function Workers() {
                         </td>
                         <td className="px-2 py-2">
                           <button onClick={() => handlePaid(w.id)}
-                            className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] rounded-lg shadow-sm flex items-center space-x-1 transition-all">
+                            className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-lg shadow-sm flex items-center space-x-1.5 transition-all">
                             <DollarSign className="h-3 w-3" /><span>Payé</span>
                           </button>
                         </td>
@@ -272,8 +272,8 @@ export default function Workers() {
               </div>
             </div>
             <div className="px-6 py-4 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-700/50 flex space-x-3">
-              <button type="button" onClick={() => setWorkerModalOpen(false)} className="flex-1 py-2 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:text-slate-300 text-sm font-semibold">{t('cancel')}</button>
-              <button type="submit" className="flex-1 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg text-sm shadow-md">{t('save')}</button>
+              <button type="button" onClick={() => setWorkerModalOpen(false)} className="flex-1 py-2.5 bg-white border border-slate-200 hover:bg-slate-100 dark:bg-slate-800 dark:border-slate-700 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 rounded-xl text-sm font-bold transition-colors">{t('cancel')}</button>
+              <button type="submit" className="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-sm shadow-md">{t('save')}</button>
             </div>
           </form>
         </div>

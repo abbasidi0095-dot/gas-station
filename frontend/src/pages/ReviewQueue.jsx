@@ -133,9 +133,9 @@ export default function ReviewQueue() {
                     </div>
                   </div>
                 </div>
-                <div className="pt-4 border-t border-slate-100 dark:border-slate-700/50 flex space-x-2">
-                  <button onClick={() => handleReviewAction('rejected')} disabled={submitting} className="flex-1 py-2 bg-red-50 dark:bg-red-900/30 hover:bg-red-100 dark:hover:bg-red-900/50 text-red-700 dark:text-red-400 rounded-lg text-xs font-bold transition-all flex items-center justify-center space-x-1.5"><Ban className="h-4 w-4" /><span>{t('reject')}</span></button>
-                  <button onClick={() => handleReviewAction('confirmed')} disabled={submitting} className="flex-1 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold shadow-md transition-all flex items-center justify-center space-x-1.5"><Check className="h-4 w-4" /><span>{t('approveLedger')}</span></button>
+                <div className="pt-4 border-t border-slate-100 dark:border-slate-700/50 flex space-x-3">
+                  <button onClick={() => handleReviewAction('rejected')} disabled={submitting} className="flex-1 py-2.5 bg-red-50 dark:bg-red-900/30 hover:bg-red-100 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400 rounded-xl text-sm font-bold transition-all flex items-center justify-center space-x-2 border border-red-100 dark:border-red-800/50 hover:border-red-200 disabled:opacity-30 disabled:cursor-not-allowed"><Ban className="h-4 w-4" /><span>{t('reject')}</span></button>
+                  <button onClick={() => handleReviewAction('confirmed')} disabled={submitting} className="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-bold shadow-lg shadow-emerald-600/20 transition-all flex items-center justify-center space-x-2 disabled:opacity-30 disabled:cursor-not-allowed"><Check className="h-4 w-4" /><span>{t('approveLedger')}</span></button>
                 </div>
               </div>
             </div>
