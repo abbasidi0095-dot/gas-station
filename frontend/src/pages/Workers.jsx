@@ -98,8 +98,8 @@ export default function Workers() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-black text-slate-900 tracking-tight">{t('staffPayroll')}</h2>
-          <p className="text-sm text-slate-500">{t('staffDesc')}</p>
+          <h2 className="text-2xl font-black text-slate-900 dark:text-slate-50 tracking-tight">{t('staffPayroll')}</h2>
+          <p className="text-sm text-slate-500 dark:text-slate-400">{t('staffDesc')}</p>
         </div>
         <div className="flex space-x-2">
           <button onClick={() => { setEditingWorker(null); setWorkerModalOpen(true); }} className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-md flex items-center space-x-2 transition-all">
@@ -116,14 +116,14 @@ export default function Workers() {
       ) : (
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 items-start">
           <div className="xl:col-span-2 space-y-4">
-            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-              <div className="p-5 border-b border-slate-100 flex items-center space-x-3 bg-slate-50">
+            <div className="bg-white dark:bg-slate-800/80 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm overflow-hidden">
+              <div className="p-5 border-b border-slate-100 dark:border-slate-700/50 flex items-center space-x-3 bg-slate-50 dark:bg-slate-800/50">
                 <Users className="h-5 w-5 text-indigo-600" />
-                <h3 className="font-bold text-slate-900">{t('roster')} ({workers.length})</h3>
+                <h3 className="font-bold text-slate-900 dark:text-slate-50">{t('roster')} ({workers.length})</h3>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm text-left">
-                  <thead className="bg-slate-100 text-slate-500 uppercase text-[10px] font-bold tracking-wider">
+                  <thead className="bg-slate-100 text-slate-500 dark:text-slate-400 uppercase text-[10px] font-bold tracking-wider">
                     <tr>
                       <th className="px-5 py-3">{t('name')}</th>
                       <th className="px-5 py-3">{t('cin')}</th>
@@ -133,20 +133,20 @@ export default function Workers() {
                       <th className="px-5 py-3 text-right">{t('actions')}</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
+                  <tbody className="divide-y divide-slate-100 font-medium text-slate-700 dark:text-slate-300">
                     {workers.map((w) => (
-                      <tr key={w.id} className="hover:bg-slate-50">
-                        <td className="px-5 py-3.5 font-bold text-slate-900">{w.name}</td>
+                      <tr key={w.id} className="hover:bg-slate-50 dark:bg-slate-800/50 dark:hover:bg-slate-700/30">
+                        <td className="px-5 py-3.5 font-bold text-slate-900 dark:text-slate-50">{w.name}</td>
                         <td className="px-5 py-3.5"><span className="inline-flex items-center space-x-1 text-slate-600"><BadgeCheck className="h-3.5 w-3.5 text-indigo-400" />{w.cin}</span></td>
                         <td className="px-5 py-3.5">{w.position === 'Pump Attendant' ? t('pumpAttendant') : w.position === 'Cashier' ? t('cashier') : w.position === 'Technician' ? t('technician') : w.position}</td>
-                        <td className="px-5 py-3.5 text-slate-500">{w.phone}</td>
+                        <td className="px-5 py-3.5 text-slate-500 dark:text-slate-400">{w.phone}</td>
                         <td className="px-5 py-3.5">
                           <button onClick={() => handleToggleStatus(w)} className={`inline-flex px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${w.active ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-600'}`}>
                             {w.active ? t('active') : t('inactive')}
                           </button>
                         </td>
                         <td className="px-5 py-3.5 text-right">
-                          <button onClick={() => launchEditWorker(w)} className="p-1 hover:bg-slate-200 text-slate-500 rounded transition-colors"><Edit2 className="h-4 w-4" /></button>
+                          <button onClick={() => launchEditWorker(w)} className="p-1 hover:bg-slate-200 text-slate-500 dark:text-slate-400 rounded transition-colors"><Edit2 className="h-4 w-4" /></button>
                         </td>
                       </tr>
                     ))}
@@ -157,9 +157,9 @@ export default function Workers() {
           </div>
 
           <div className="xl:col-span-1 space-y-4">
-            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-              <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
-                <div className="flex items-center space-x-3"><Wallet className="h-5 w-5 text-slate-900" /><h3 className="font-bold text-slate-900">{t('payroll')} ({payments.length})</h3></div>
+            <div className="bg-white dark:bg-slate-800/80 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm overflow-hidden">
+              <div className="p-5 border-b border-slate-100 dark:border-slate-700/50 flex items-center justify-between bg-slate-50 dark:bg-slate-800/50">
+                <div className="flex items-center space-x-3"><Wallet className="h-5 w-5 text-slate-900 dark:text-slate-50" /><h3 className="font-bold text-slate-900 dark:text-slate-50">{t('payroll')} ({payments.length})</h3></div>
                 <span className="text-xs font-bold text-emerald-600">{totalPaid.toLocaleString(undefined, { minimumFractionDigits: 2 })} MAD / DH</span>
               </div>
               <div className="divide-y divide-slate-100 max-h-[500px] overflow-y-auto">
@@ -167,10 +167,10 @@ export default function Workers() {
                   <div className="p-8 text-center text-slate-400 text-sm">{t('noPayments')}</div>
                 ) : (
                   payments.map((p) => (
-                    <div key={p.id} className="p-4 hover:bg-slate-50 flex items-start justify-between">
+                    <div key={p.id} className="p-4 hover:bg-slate-50 dark:bg-slate-800/50 dark:hover:bg-slate-700/50 flex items-start justify-between">
                       <div className="space-y-1">
-                        <h4 className="font-bold text-sm text-slate-900">{p.worker?.name}</h4>
-                        <p className="text-xs font-semibold text-slate-500">{new Date(p.date).toLocaleDateString()} &bull; {(p.amount || 0).toFixed(2)} MAD / DH</p>
+                        <h4 className="font-bold text-sm text-slate-900 dark:text-slate-50">{p.worker?.name}</h4>
+                        <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">{new Date(p.date).toLocaleDateString()} &bull; {(p.amount || 0).toFixed(2)} MAD / DH</p>
                         {p.description && <p className="text-xs text-slate-400 italic">"{p.description}"</p>}
                       </div>
                       <button onClick={() => handleDeletePayment(p.id)} className="p-1 hover:bg-red-50 text-red-500 rounded transition-all"><Trash2 className="h-4 w-4" /></button>
@@ -185,24 +185,24 @@ export default function Workers() {
 
       {workerModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm">
-          <form onSubmit={handleSaveWorker} className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border">
-            <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-              <h3 className="font-bold text-slate-900 text-md">{editingWorker ? t('modifyStaff') : t('registerStaff')}</h3>
+          <form onSubmit={handleSaveWorker} className="bg-white dark:bg-slate-800/80 rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border">
+            <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-700/50 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
+              <h3 className="font-bold text-slate-900 dark:text-slate-50 text-md">{editingWorker ? t('modifyStaff') : t('registerStaff')}</h3>
               <button type="button" onClick={() => setWorkerModalOpen(false)} className="p-1 text-slate-400 hover:text-slate-600"><X className="h-5 w-5" /></button>
             </div>
             <div className="p-6 space-y-4">
               <div>
                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">{t('fullName')}</label>
-                <input type="text" required value={name} onChange={(e) => setName(e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm text-slate-800" />
+                <input type="text" required value={name} onChange={(e) => setName(e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm text-slate-800 dark:text-slate-200" />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">{t('cinLabel')}</label>
-                  <input type="text" required placeholder="AB123456" value={cin} onChange={(e) => setCin(e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm text-slate-800" />
+                  <input type="text" required placeholder="AB123456" value={cin} onChange={(e) => setCin(e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm text-slate-800 dark:text-slate-200" />
                 </div>
                 <div>
                   <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">{t('position')}</label>
-                  <select value={position} onChange={(e) => setPosition(e.target.value)} required className="w-full border rounded-lg px-3 py-2 text-sm text-slate-800">
+                  <select value={position} onChange={(e) => setPosition(e.target.value)} required className="w-full border rounded-lg px-3 py-2 text-sm text-slate-800 dark:text-slate-200">
                     <option value="">{t('selectPosition')}</option>
                     {positionOptions.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                   </select>
@@ -211,16 +211,16 @@ export default function Workers() {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">{t('phone')}</label>
-                  <input type="text" required placeholder="+212..." value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm text-slate-800" />
+                  <input type="text" required placeholder="+212..." value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm text-slate-800 dark:text-slate-200" />
                 </div>
                 <div>
                   <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">{t('hireDate')}</label>
-                  <input type="date" required value={hireDate} onChange={(e) => setHireDate(e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm text-slate-800" />
+                  <input type="date" required value={hireDate} onChange={(e) => setHireDate(e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm text-slate-800 dark:text-slate-200" />
                 </div>
               </div>
             </div>
-            <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex space-x-3">
-              <button type="button" onClick={() => setWorkerModalOpen(false)} className="flex-1 py-2 text-slate-500 hover:text-slate-700 text-sm font-semibold">{t('cancel')}</button>
+            <div className="px-6 py-4 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-700/50 flex space-x-3">
+              <button type="button" onClick={() => setWorkerModalOpen(false)} className="flex-1 py-2 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:text-slate-300 text-sm font-semibold">{t('cancel')}</button>
               <button type="submit" className="flex-1 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg text-sm shadow-md">{t('save')}</button>
             </div>
           </form>
@@ -229,15 +229,15 @@ export default function Workers() {
 
       {paymentModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm">
-          <form onSubmit={handleSavePayment} className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border">
-            <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-              <h3 className="font-bold text-slate-900 text-md">{t('logSalaryPayment')}</h3>
+          <form onSubmit={handleSavePayment} className="bg-white dark:bg-slate-800/80 rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border">
+            <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-700/50 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
+              <h3 className="font-bold text-slate-900 dark:text-slate-50 text-md">{t('logSalaryPayment')}</h3>
               <button type="button" onClick={() => setPaymentModalOpen(false)} className="p-1 text-slate-400 hover:text-slate-600"><X className="h-5 w-5" /></button>
             </div>
             <div className="p-6 space-y-4">
               <div>
                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">{t('selectWorker')}</label>
-                <select value={payWorkerId} onChange={(e) => setPayWorkerId(e.target.value)} required className="w-full border rounded-lg px-3 py-2 text-sm text-slate-800">
+                <select value={payWorkerId} onChange={(e) => setPayWorkerId(e.target.value)} required className="w-full border rounded-lg px-3 py-2 text-sm text-slate-800 dark:text-slate-200">
                   <option value="">{t('selectPosition')}</option>
                   {workers.map(w => <option key={w.id} value={w.id}>{w.name} ({w.cin})</option>)}
                 </select>
@@ -245,20 +245,20 @@ export default function Workers() {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">{t('paymentAmount')}</label>
-                  <input type="number" step="0.01" min="0" required placeholder="0.00" value={payAmount} onChange={(e) => setPayAmount(e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm text-slate-800" />
+                  <input type="number" step="0.01" min="0" required placeholder="0.00" value={payAmount} onChange={(e) => setPayAmount(e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm text-slate-800 dark:text-slate-200" />
                 </div>
                 <div>
                   <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">{t('paymentDate')}</label>
-                  <input type="date" required value={payDate} onChange={(e) => setPayDate(e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm text-slate-800" />
+                  <input type="date" required value={payDate} onChange={(e) => setPayDate(e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm text-slate-800 dark:text-slate-200" />
                 </div>
               </div>
               <div>
                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">{t('paymentNotes')}</label>
-                <textarea rows="3" placeholder={t('paymentNotesPlaceholder')} value={payNotes} onChange={(e) => setPayNotes(e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm text-slate-800" />
+                <textarea rows="3" placeholder={t('paymentNotesPlaceholder')} value={payNotes} onChange={(e) => setPayNotes(e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm text-slate-800 dark:text-slate-200" />
               </div>
             </div>
-            <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex space-x-3">
-              <button type="button" onClick={() => setPaymentModalOpen(false)} className="flex-1 py-2 text-slate-500 hover:text-slate-700 text-sm font-semibold">{t('cancel')}</button>
+            <div className="px-6 py-4 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-700/50 flex space-x-3">
+              <button type="button" onClick={() => setPaymentModalOpen(false)} className="flex-1 py-2 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:text-slate-300 text-sm font-semibold">{t('cancel')}</button>
               <button type="submit" className="flex-1 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg text-sm shadow-md">{t('logPaymentBtn')}</button>
             </div>
           </form>

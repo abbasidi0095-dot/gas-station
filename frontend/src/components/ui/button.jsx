@@ -3,9 +3,9 @@ import { cn } from '@/lib/utils';
 export function Button({ className, variant = 'default', size = 'default', ...props }) {
   const base = 'inline-flex items-center justify-center rounded-lg text-sm font-medium whitespace-nowrap transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50 disabled:pointer-events-none disabled:opacity-50';
   const variants = {
-    default: 'bg-slate-900 text-white hover:bg-slate-800 shadow-sm',
-    outline: 'border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 shadow-sm',
-    ghost: 'hover:bg-slate-100 text-slate-700',
+    default: 'bg-slate-900 dark:bg-slate-700 text-white hover:bg-slate-800 dark:hover:bg-slate-600 shadow-sm',
+    outline: 'border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 shadow-sm',
+    ghost: 'hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300',
     destructive: 'bg-red-600 text-white hover:bg-red-700 shadow-sm',
   };
   const sizes = {

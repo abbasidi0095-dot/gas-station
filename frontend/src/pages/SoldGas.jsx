@@ -124,16 +124,16 @@ export default function SoldGas() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-black text-slate-900 tracking-tight flex items-center space-x-2">
+          <h2 className="text-2xl font-black text-slate-900 dark:text-slate-50 tracking-tight flex items-center space-x-2">
             <Fuel className="h-7 w-7 text-emerald-600" />
             <span>{t('soldGas')}</span>
           </h2>
-          <p className="text-sm text-slate-500 mt-1">{t('soldGasDesc')}</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{t('soldGasDesc')}</p>
         </div>
       </div>
 
       {/* Upload Zone */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
+      <div className="bg-white dark:bg-slate-800/80 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm p-5">
         <Dropzone
           src={files}
           onDrop={handleDrop}
@@ -166,25 +166,25 @@ export default function SoldGas() {
       {loading ? (
         <div className="w-full py-16 flex flex-col items-center space-y-3">
           <div className="h-8 w-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-          <span className="text-sm font-semibold text-slate-400">{t('loadingQueue')}</span>
+          <span className="text-sm font-semibold text-slate-400 dark:text-slate-500">{t('loadingQueue')}</span>
         </div>
       ) : queue.length === 0 ? (
-        <div className="max-w-lg mx-auto text-center py-16 bg-white rounded-2xl border border-slate-100 shadow-sm">
+        <div className="max-w-lg mx-auto text-center py-16 bg-white dark:bg-slate-800/80 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm">
           <div className="p-4 bg-emerald-50 rounded-full text-emerald-500 inline-flex mb-4">
             <Fuel className="h-10 w-10" />
           </div>
-          <h3 className="font-bold text-slate-900 text-lg">{t('soldGasQueueClear')}</h3>
-          <p className="text-sm text-slate-500 mt-2 max-w-sm mx-auto">{t('soldGasQueueClearDesc')}</p>
+          <h3 className="font-bold text-slate-900 dark:text-slate-50 text-lg">{t('soldGasQueueClear')}</h3>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-2 max-w-sm mx-auto">{t('soldGasQueueClearDesc')}</p>
         </div>
       ) : (
         <div className="space-y-4 animate-fade-in-up">
           {/* Progress bar */}
-          <div className="flex items-center justify-between bg-white rounded-xl border border-slate-100 shadow-sm px-5 py-3">
+          <div className="flex items-center justify-between bg-white dark:bg-slate-800/80 rounded-xl border border-slate-100 dark:border-slate-700/50 shadow-sm px-5 py-3">
             <div className="flex items-center space-x-3">
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">{t('reviewing')}</span>
+              <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">{t('reviewing')}</span>
               <div className="flex items-baseline space-x-1">
-                <span className="text-lg font-black text-slate-900">{currentIdx + 1}</span>
-                <span className="text-sm text-slate-400">/</span>
+                <span className="text-lg font-black text-slate-900 dark:text-slate-50">{currentIdx + 1}</span>
+                <span className="text-sm text-slate-400 dark:text-slate-500">/</span>
                 <span className="text-sm font-semibold text-slate-600">{queue.length}</span>
               </div>
             </div>
@@ -216,7 +216,7 @@ export default function SoldGas() {
                 <CarouselContent>
                   {queue.map((rc, i) => (
                     <CarouselItem key={rc.id}>
-                      <div className={`grid grid-cols-1 lg:grid-cols-2 gap-5 bg-white rounded-2xl border border-slate-100 shadow-sm p-5 overflow-hidden ${i === currentIdx ? '' : 'pointer-events-none'}`}>
+                      <div className={`grid grid-cols-1 lg:grid-cols-2 gap-5 bg-white dark:bg-slate-800/80 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm p-5 overflow-hidden ${i === currentIdx ? '' : 'pointer-events-none'}`}>
                         {/* Receipt image */}
                         <div className="relative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950 rounded-xl overflow-hidden flex items-center justify-center min-h-[380px] max-h-[560px]">
                           <img
@@ -243,50 +243,50 @@ export default function SoldGas() {
                         <div className="flex flex-col justify-between space-y-4">
                           <div className="space-y-4">
                             <div>
-                              <h3 className="font-bold text-slate-900">{t('soldGasApproveTitle')}</h3>
-                              <p className="text-xs text-slate-400">{t('soldGasApproveDesc')}</p>
+                              <h3 className="font-bold text-slate-900 dark:text-slate-50">{t('soldGasApproveTitle')}</h3>
+                              <p className="text-xs text-slate-400 dark:text-slate-500">{t('soldGasApproveDesc')}</p>
                             </div>
 
                             {rc.extractedRawText && (
-                              <div className="bg-slate-50 rounded-xl p-3 max-h-24 overflow-y-auto border border-slate-100">
-                                <p className="text-[11px] text-slate-400 font-mono whitespace-pre-wrap leading-relaxed">{rc.extractedRawText}</p>
+                              <div className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-3 max-h-24 overflow-y-auto border border-slate-100 dark:border-slate-700/50">
+                                <p className="text-[11px] text-slate-400 dark:text-slate-500 font-mono whitespace-pre-wrap leading-relaxed">{rc.extractedRawText}</p>
                               </div>
                             )}
 
                             <div className="space-y-3.5">
                               <div>
-                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1.5">{t('vendor')}</label>
-                                <select value={i === currentIdx ? vVendorId : ''} onChange={(e) => i === currentIdx && setVVendorId(e.target.value)} disabled={i !== currentIdx} className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm font-medium text-slate-800 bg-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                                <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block mb-1.5">{t('vendor')}</label>
+                                <select value={i === currentIdx ? vVendorId : ''} onChange={(e) => i === currentIdx && setVVendorId(e.target.value)} disabled={i !== currentIdx} className="w-full rounded-xl border border-slate-200 dark:border-slate-600 px-3.5 py-2.5 text-sm font-medium text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-700/80 focus:ring-2 focus:ring-emerald-500/20 dark:focus:ring-emerald-400/20 focus:border-emerald-500 dark:focus:border-emerald-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
                                   <option value="">{t('unassigned')}</option>
                                   {vendors.map((v) => <option key={v.id} value={v.id}>{v.name}</option>)}
                                 </select>
                               </div>
                               <div className="grid grid-cols-3 gap-3">
                                 <div>
-                                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1.5">Fuel</label>
-                                  <select value={i === currentIdx ? vFuelType : ''} onChange={(e) => i === currentIdx && setVFuelType(e.target.value)} disabled={i !== currentIdx} className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm font-medium text-slate-800 bg-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                                  <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block mb-1.5">Fuel</label>
+                                  <select value={i === currentIdx ? vFuelType : ''} onChange={(e) => i === currentIdx && setVFuelType(e.target.value)} disabled={i !== currentIdx} className="w-full rounded-xl border border-slate-200 dark:border-slate-600 px-3.5 py-2.5 text-sm font-medium text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-700/80 focus:ring-2 focus:ring-emerald-500/20 dark:focus:ring-emerald-400/20 focus:border-emerald-500 dark:focus:border-emerald-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
                                     <option value="gasoil">Gasoil</option>
                                     <option value="essence">Essence</option>
                                     <option value="other">Other</option>
                                   </select>
                                 </div>
                                 <div>
-                                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1.5">{t('verifyAmount')}</label>
-                                  <input type="number" step="0.01" min="0" value={i === currentIdx ? vAmount : ''} onChange={(e) => i === currentIdx && setVAmount(e.target.value)} disabled={i !== currentIdx} className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm font-medium text-slate-800 bg-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all disabled:opacity-50" />
+                                  <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block mb-1.5">{t('verifyAmount')}</label>
+                                  <input type="number" step="0.01" min="0" value={i === currentIdx ? vAmount : ''} onChange={(e) => i === currentIdx && setVAmount(e.target.value)} disabled={i !== currentIdx} className="w-full rounded-xl border border-slate-200 dark:border-slate-600 px-3.5 py-2.5 text-sm font-medium text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-700/80 focus:ring-2 focus:ring-emerald-500/20 dark:focus:ring-emerald-400/20 focus:border-emerald-500 dark:focus:border-emerald-400 transition-all disabled:opacity-50" />
                                 </div>
                                 <div>
-                                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1.5">{t('receiptDate')}</label>
-                                  <input type="date" value={i === currentIdx ? vDate : ''} onChange={(e) => i === currentIdx && setVDate(e.target.value)} disabled={i !== currentIdx} className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm font-medium text-slate-800 bg-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all disabled:opacity-50" />
+                                  <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block mb-1.5">{t('receiptDate')}</label>
+                                  <input type="date" value={i === currentIdx ? vDate : ''} onChange={(e) => i === currentIdx && setVDate(e.target.value)} disabled={i !== currentIdx} className="w-full rounded-xl border border-slate-200 dark:border-slate-600 px-3.5 py-2.5 text-sm font-medium text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-700/80 focus:ring-2 focus:ring-emerald-500/20 dark:focus:ring-emerald-400/20 focus:border-emerald-500 dark:focus:border-emerald-400 transition-all disabled:opacity-50" />
                                 </div>
                               </div>
                               <div>
-                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1.5">{t('notesRemarks')}</label>
-                                <textarea rows={2} value={i === currentIdx ? vDescription : ''} onChange={(e) => i === currentIdx && setVDescription(e.target.value)} disabled={i !== currentIdx} className="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm font-medium text-slate-800 bg-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all resize-none disabled:opacity-50" />
+                                <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block mb-1.5">{t('notesRemarks')}</label>
+                                <textarea rows={2} value={i === currentIdx ? vDescription : ''} onChange={(e) => i === currentIdx && setVDescription(e.target.value)} disabled={i !== currentIdx} className="w-full rounded-xl border border-slate-200 dark:border-slate-600 px-3.5 py-2.5 text-sm font-medium text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-700/80 focus:ring-2 focus:ring-emerald-500/20 dark:focus:ring-emerald-400/20 focus:border-emerald-500 dark:focus:border-emerald-400 transition-all resize-none disabled:opacity-50" />
                               </div>
                             </div>
                           </div>
 
-                          <div className="pt-4 border-t border-slate-100 flex space-x-3">
+                          <div className="pt-4 border-t border-slate-100 dark:border-slate-700/50 flex space-x-3">
                             <button
                               onClick={() => handleAction('rejected')}
                               disabled={submitting || i !== currentIdx}
@@ -309,8 +309,8 @@ export default function SoldGas() {
                     </CarouselItem>
                   ))}
                 </CarouselContent>
-                <CarouselPrevious className="hidden lg:flex -left-4 bg-white border-slate-200 shadow-lg hover:bg-slate-50 text-slate-600" />
-                <CarouselNext className="hidden lg:flex -right-4 bg-white border-slate-200 shadow-lg hover:bg-slate-50 text-slate-600" />
+                <CarouselPrevious className="hidden lg:flex -left-4 bg-white dark:bg-slate-800/80 border-slate-200 dark:border-slate-600 shadow-lg hover:bg-slate-50 dark:hover:bg-slate-700/50 text-slate-600" />
+                <CarouselNext className="hidden lg:flex -right-4 bg-white dark:bg-slate-800/80 border-slate-200 dark:border-slate-600 shadow-lg hover:bg-slate-50 dark:hover:bg-slate-700/50 text-slate-600" />
               </Carousel>
             </div>
           )}
@@ -330,7 +330,7 @@ export default function SoldGas() {
                     className={`snap-start shrink-0 w-14 h-14 rounded-xl overflow-hidden border-2 transition-all duration-200 ${
                       i === currentIdx
                         ? 'border-emerald-600 ring-2 ring-emerald-200 shadow-md scale-105'
-                        : 'border-slate-200 opacity-60 hover:opacity-100 hover:border-slate-300'
+                        : 'border-slate-200 dark:border-slate-600 opacity-60 hover:opacity-100 hover:border-slate-300'
                     }`}
                   >
                     <img src={rc.imageUrl} alt={`Receipt ${i + 1}`} className="h-full w-full object-cover" />

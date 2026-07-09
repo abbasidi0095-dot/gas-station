@@ -60,14 +60,14 @@ export default function Dashboard() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-black text-slate-900 tracking-tight">{t('execDashboard')}</h2>
-          <p className="text-sm text-slate-500">{t('dashboardDesc')}</p>
+          <h2 className="text-2xl font-black text-slate-900 dark:text-slate-50 tracking-tight">{t('execDashboard')}</h2>
+          <p className="text-sm text-slate-500 dark:text-slate-400">{t('dashboardDesc')}</p>
         </div>
         <div className="flex items-center space-x-2.5">
           <button onClick={() => setScannerOpen(true)} className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl shadow-md flex items-center space-x-2 transition-all">
             <Sparkles className="h-4 w-4" /><span>{t('smartScan')}</span>
           </button>
-          <button onClick={() => setExportOpen(true)} className="px-4 py-2 border border-slate-300 hover:bg-slate-100 bg-white text-slate-700 font-bold text-sm rounded-xl shadow-sm flex items-center space-x-2 transition-all">
+          <button onClick={() => setExportOpen(true)} className="px-4 py-2 border border-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 bg-white dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 font-bold text-sm rounded-xl shadow-sm dark:shadow-slate-900/50 flex items-center space-x-2 transition-all">
             <FileOutput className="h-4 w-4" /><span>{t('exportData')}</span>
           </button>
         </div>
@@ -75,11 +75,11 @@ export default function Dashboard() {
 
       {/* Review banner */}
       {pendingCount > 0 && (
-        <div onClick={() => navigate('/review-queue')} className="p-4 bg-amber-50 hover:bg-amber-100/70 border border-amber-200 text-amber-900 rounded-2xl flex items-center justify-between cursor-pointer transition-all shadow-sm">
+        <div onClick={() => navigate('/review-queue')} className="p-4 bg-amber-50 hover:bg-amber-100/70 border border-amber-200 text-amber-900 rounded-2xl flex items-center justify-between cursor-pointer transition-all shadow-sm dark:shadow-slate-900/50">
           <div className="flex items-center space-x-3">
             <div className="p-2 bg-amber-100 rounded-xl text-amber-700 animate-bounce"><AlertOctagon className="h-5 w-5" /></div>
             <div>
-              <p className="text-sm font-bold text-slate-900">{t('reviewRequired')}</p>
+              <p className="text-sm font-bold text-slate-900 dark:text-slate-50">{t('reviewRequired')}</p>
               <p className="text-xs text-slate-600">{t('reviewRequiredDesc', { n: pendingCount })}</p>
             </div>
           </div>
@@ -88,19 +88,19 @@ export default function Dashboard() {
       )}
 
       {/* Range controls */}
-      <div className="flex items-center justify-between bg-white p-3 rounded-2xl shadow-sm border border-slate-100">
+      <div className="flex items-center justify-between bg-white dark:bg-slate-800/80 p-3 rounded-2xl shadow-sm dark:shadow-slate-900/50 border border-slate-100 dark:border-slate-700/50">
         <div className="flex items-center space-x-1">
           {[
             { label: t('weekView'), val: 'week' },
             { label: t('monthView'), val: 'month' },
             { label: t('yearView'), val: 'year' }
           ].map((item) => (
-            <button key={item.val} onClick={() => setRange(item.val)} className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${range === item.val ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'}`}>
+            <button key={item.val} onClick={() => setRange(item.val)} className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${range === item.val ? 'bg-slate-900 text-white shadow-sm dark:shadow-slate-900/50' : 'text-slate-600 hover:bg-slate-100'}`}>
               {item.label}
             </button>
           ))}
         </div>
-        <button onClick={fetchDashboardData} className="p-2 rounded-lg text-slate-400 hover:bg-slate-50 hover:text-slate-600 transition-colors" title={t('refresh')}>
+        <button onClick={fetchDashboardData} className="p-2 rounded-lg text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-700/50 hover:text-slate-600 transition-colors" title={t('refresh')}>
           <RefreshCcw className="h-4 w-4" />
         </button>
       </div>
@@ -108,7 +108,7 @@ export default function Dashboard() {
       {loading ? (
         <div className="w-full h-80 flex flex-col items-center justify-center space-y-3">
           <div className="h-8 w-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin" />
-          <span className="text-sm font-semibold text-slate-500">{t('aggregating')}</span>
+          <span className="text-sm font-semibold text-slate-500 dark:text-slate-400">{t('aggregating')}</span>
         </div>
       ) : error ? (
         <div className="bg-red-50 p-6 rounded-2xl text-center max-w-md mx-auto">
@@ -120,26 +120,26 @@ export default function Dashboard() {
         <>
           {/* Summary Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-start justify-between">
+            <div className="bg-white dark:bg-slate-800/80 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm dark:shadow-slate-900/50 flex items-start justify-between">
               <div className="space-y-2">
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">{t('totalRevenue')}</span>
-                <h3 className="text-3xl font-black text-slate-900">{data.summary.totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2 })} <span className="text-xs font-semibold text-slate-400">MAD / DH</span></h3>
+                <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">{t('totalRevenue')}</span>
+                <h3 className="text-3xl font-black text-slate-900 dark:text-slate-50">{data.summary.totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2 })} <span className="text-xs font-semibold text-slate-400 dark:text-slate-500">MAD / DH</span></h3>
                 <span className="inline-flex items-center text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded"><TrendingUp className="h-3 w-3 mr-1" /><span>{t('receiptsSales')}</span></span>
               </div>
               <div className="p-3 bg-emerald-50 rounded-xl text-emerald-600"><TrendingUp className="h-6 w-6" /></div>
             </div>
-            <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-start justify-between">
+            <div className="bg-white dark:bg-slate-800/80 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm dark:shadow-slate-900/50 flex items-start justify-between">
               <div className="space-y-2">
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">{t('totalSpend')}</span>
-                <h3 className="text-3xl font-black text-slate-900">{data.summary.totalCharges.toLocaleString(undefined, { minimumFractionDigits: 2 })} <span className="text-xs font-semibold text-slate-400">MAD / DH</span></h3>
+                <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">{t('totalSpend')}</span>
+                <h3 className="text-3xl font-black text-slate-900 dark:text-slate-50">{data.summary.totalCharges.toLocaleString(undefined, { minimumFractionDigits: 2 })} <span className="text-xs font-semibold text-slate-400 dark:text-slate-500">MAD / DH</span></h3>
                 <span className="inline-flex items-center text-xs font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded"><TrendingDown className="h-3 w-3 mr-1" /><span>{t('chargesLogistics')}</span></span>
               </div>
               <div className="p-3 bg-red-50 rounded-xl text-red-600"><TrendingDown className="h-6 w-6" /></div>
             </div>
-            <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-start justify-between">
+            <div className="bg-white dark:bg-slate-800/80 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm dark:shadow-slate-900/50 flex items-start justify-between">
               <div className="space-y-2">
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">{t('netProfit')}</span>
-                <h3 className={`text-3xl font-black ${data.summary.netProfit >= 0 ? 'text-slate-900' : 'text-red-700'}`}>{data.summary.netProfit.toLocaleString(undefined, { minimumFractionDigits: 2 })} <span className="text-xs font-semibold text-slate-400">MAD / DH</span></h3>
+                <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">{t('netProfit')}</span>
+                <h3 className={`text-3xl font-black ${data.summary.netProfit >= 0 ? 'text-slate-900 dark:text-slate-50' : 'text-red-700'}`}>{data.summary.netProfit.toLocaleString(undefined, { minimumFractionDigits: 2 })} <span className="text-xs font-semibold text-slate-400 dark:text-slate-500">MAD / DH</span></h3>
                 <span className={`inline-flex items-center text-xs font-bold px-2 py-0.5 rounded ${data.summary.netProfit >= 0 ? 'bg-indigo-50 text-indigo-700' : 'bg-red-50 text-red-700'}`}><Landmark className="h-3 w-3 mr-1" /><span>{data.summary.netProfit >= 0 ? t('surplus') : t('deficit')}</span></span>
               </div>
               <div className={`p-3 rounded-xl ${data.summary.netProfit >= 0 ? 'bg-indigo-50 text-indigo-600' : 'bg-red-50 text-red-600'}`}><Landmark className="h-6 w-6" /></div>
@@ -147,14 +147,14 @@ export default function Dashboard() {
           </div>
 
           {/* Trend Chart */}
-          <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm space-y-4">
+          <div className="bg-white dark:bg-slate-800/80 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm dark:shadow-slate-900/50 space-y-4">
             <div>
-              <h4 className="font-bold text-slate-900 text-md">{t('trendTitle')}</h4>
-              <p className="text-xs text-slate-400">{t('trendDesc')}</p>
+              <h4 className="font-bold text-slate-900 dark:text-slate-50 text-md">{t('trendTitle')}</h4>
+              <p className="text-xs text-slate-400 dark:text-slate-500">{t('trendDesc')}</p>
             </div>
             <div className="h-80 w-full text-xs">
               {data.chartsData.length === 0 ? (
-                <div className="h-full flex items-center justify-center text-slate-400 font-medium">{t('noHistory')}</div>
+                <div className="h-full flex items-center justify-center text-slate-400 dark:text-slate-500 font-medium">{t('noHistory')}</div>
               ) : (
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={data.chartsData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
@@ -174,15 +174,15 @@ export default function Dashboard() {
           {/* Vendor Breakdown + Pie charts */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Vendor breakdown card */}
-            <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col">
+            <div className="bg-white dark:bg-slate-800/80 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm dark:shadow-slate-900/50 flex flex-col">
               <div className="flex items-center space-x-2 mb-1">
                 <Building2 className="h-4 w-4 text-indigo-600" />
-                <h4 className="font-bold text-slate-900 text-md">{t('vendorBreakdown')}</h4>
+                <h4 className="font-bold text-slate-900 dark:text-slate-50 text-md">{t('vendorBreakdown')}</h4>
               </div>
-              <p className="text-xs text-slate-400 mb-4">{t('vendorBreakdownDesc')}</p>
+              <p className="text-xs text-slate-400 dark:text-slate-500 mb-4">{t('vendorBreakdownDesc')}</p>
               <div className="flex-1 space-y-3">
                 {(!data.vendorBreakdown || data.vendorBreakdown.length === 0) ? (
-                  <div className="h-full flex items-center justify-center text-slate-400 font-medium text-sm">{t('noExpenseData')}</div>
+                  <div className="h-full flex items-center justify-center text-slate-400 dark:text-slate-500 font-medium text-sm">{t('noExpenseData')}</div>
                 ) : (
                   data.vendorBreakdown.map((item, index) => {
                     const total = data.vendorBreakdown.reduce((s, i) => s + i.value, 0) || 1;
@@ -190,13 +190,13 @@ export default function Dashboard() {
                     return (
                       <div key={item.name} className="space-y-1.5">
                         <div className="flex items-center justify-between text-sm">
-                          <span className="font-semibold text-slate-700">{item.name}</span>
-                          <span className="font-bold text-slate-900">{item.value.toLocaleString(undefined, { minimumFractionDigits: 0 })} MAD / DH</span>
+                          <span className="font-semibold text-slate-700 dark:text-slate-300">{item.name}</span>
+                          <span className="font-bold text-slate-900 dark:text-slate-50">{item.value.toLocaleString(undefined, { minimumFractionDigits: 0 })} MAD / DH</span>
                         </div>
                         <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
                           <div className="h-full rounded-full" style={{ width: `${pct}%`, backgroundColor: COLORS[index % COLORS.length] }} />
                         </div>
-                        <span className="text-[10px] text-slate-400 font-bold">{pct}%</span>
+                        <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold">{pct}%</span>
                       </div>
                     );
                   })
@@ -205,11 +205,11 @@ export default function Dashboard() {
             </div>
 
             {/* Revenue pie */}
-            <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col">
-              <div><h4 className="font-bold text-slate-900 text-md">{t('revenueDist')}</h4><p className="text-xs text-slate-400">{t('revenueDistDesc')}</p></div>
+            <div className="bg-white dark:bg-slate-800/80 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm dark:shadow-slate-900/50 flex flex-col">
+              <div><h4 className="font-bold text-slate-900 dark:text-slate-50 text-md">{t('revenueDist')}</h4><p className="text-xs text-slate-400 dark:text-slate-500">{t('revenueDistDesc')}</p></div>
               <div className="h-64 w-full flex-1 mt-4">
                 {data.revenueCategories.length === 0 ? (
-                  <div className="h-full flex items-center justify-center text-slate-400 font-medium">{t('noRevenueData')}</div>
+                  <div className="h-full flex items-center justify-center text-slate-400 dark:text-slate-500 font-medium">{t('noRevenueData')}</div>
                 ) : (
                   <div className="h-full flex flex-col sm:flex-row items-center justify-center gap-6">
                     <div className="h-44 w-44">
@@ -231,11 +231,11 @@ export default function Dashboard() {
             </div>
 
             {/* Expense pie */}
-            <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col">
-              <div><h4 className="font-bold text-slate-900 text-md">{t('expenseDist')}</h4><p className="text-xs text-slate-400">{t('expenseDistDesc')}</p></div>
+            <div className="bg-white dark:bg-slate-800/80 p-6 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm dark:shadow-slate-900/50 flex flex-col">
+              <div><h4 className="font-bold text-slate-900 dark:text-slate-50 text-md">{t('expenseDist')}</h4><p className="text-xs text-slate-400 dark:text-slate-500">{t('expenseDistDesc')}</p></div>
               <div className="h-64 w-full flex-1 mt-4">
                 {data.expenseCategories.length === 0 ? (
-                  <div className="h-full flex items-center justify-center text-slate-400 font-medium">{t('noExpenseData')}</div>
+                  <div className="h-full flex items-center justify-center text-slate-400 dark:text-slate-500 font-medium">{t('noExpenseData')}</div>
                 ) : (
                   <div className="h-full flex flex-col sm:flex-row items-center justify-center gap-6">
                     <div className="h-44 w-44">
@@ -258,17 +258,17 @@ export default function Dashboard() {
           </div>
 
           {/* Recent Transactions Table */}
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-            <div className="p-5 border-b border-slate-100 flex items-center space-x-3 bg-slate-50">
+          <div className="bg-white dark:bg-slate-800/80 rounded-2xl border border-slate-100 dark:border-slate-700/50 shadow-sm dark:shadow-slate-900/50 overflow-hidden">
+            <div className="p-5 border-b border-slate-100 dark:border-slate-700/50 flex items-center space-x-3 bg-slate-50 dark:bg-slate-800/50">
               <Receipt className="h-5 w-5 text-indigo-600" />
               <div>
-                <h4 className="font-bold text-slate-900">{t('recentTransactions')}</h4>
-                <p className="text-xs text-slate-400">{t('recentTransactionsDesc')}</p>
+                <h4 className="font-bold text-slate-900 dark:text-slate-50">{t('recentTransactions')}</h4>
+                <p className="text-xs text-slate-400 dark:text-slate-500">{t('recentTransactionsDesc')}</p>
               </div>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-sm text-left">
-                <thead className="bg-slate-50 text-slate-500 uppercase text-[10px] font-bold tracking-wider">
+                <thead className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 uppercase text-[10px] font-bold tracking-wider">
                   <tr>
                     <th className="px-5 py-3">{t('date')}</th>
                     <th className="px-5 py-3">{t('supplierVendor')}</th>
@@ -276,14 +276,14 @@ export default function Dashboard() {
                     <th className="px-5 py-3 text-right">{t('amount')}</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
+                <tbody className="divide-y divide-slate-100 font-medium text-slate-700 dark:text-slate-300">
                   {recentTx.length === 0 ? (
-                    <tr><td colSpan="4" className="px-5 py-8 text-center text-slate-400">{t('noCharges')}</td></tr>
+                    <tr><td colSpan="4" className="px-5 py-8 text-center text-slate-400 dark:text-slate-500">{t('noCharges')}</td></tr>
                   ) : (
                     recentTx.map((item) => (
-                      <tr key={item.id} className="hover:bg-slate-50/50">
-                        <td className="px-5 py-3 font-bold text-slate-900">{new Date(item.date).toLocaleDateString()}</td>
-                        <td className="px-5 py-3 font-semibold text-slate-800">{item.vendor ? item.vendor.name : <span className="text-slate-400">—</span>}</td>
+                      <tr key={item.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-700/50">
+                        <td className="px-5 py-3 font-bold text-slate-900 dark:text-slate-50">{new Date(item.date).toLocaleDateString()}</td>
+                        <td className="px-5 py-3 font-semibold text-slate-800 dark:text-slate-200">{item.vendor ? item.vendor.name : <span className="text-slate-400 dark:text-slate-500">—</span>}</td>
                         <td className="px-5 py-3">{catLabel(item.category)}</td>
                         <td className="px-5 py-3 text-right font-bold text-red-600">-{(item.amount || 0).toFixed(2)}</td>
                       </tr>

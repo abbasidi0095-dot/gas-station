@@ -195,25 +195,25 @@ export default function ReceiptScanner({ onClose, onScanComplete }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full overflow-hidden border border-slate-100 flex flex-col max-h-[92vh]">
+      <div className="bg-white dark:bg-slate-800/90 rounded-2xl shadow-2xl max-w-3xl w-full overflow-hidden border border-slate-100 dark:border-slate-700/50 flex flex-col max-h-[92vh]">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50 shrink-0">
+        <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-700/50 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50 shrink-0">
           <div className="flex items-center space-x-2">
             <Sparkles className="h-5 w-5 text-indigo-600" />
-            <h3 className="font-bold text-slate-900 text-lg">{t('receiptEntry')}</h3>
+            <h3 className="font-bold text-slate-900 dark:text-slate-50 text-lg">{t('receiptEntry')}</h3>
           </div>
-          <button onClick={handleClose} className="p-1 rounded-full hover:bg-slate-200 text-slate-500 transition-colors">
+          <button onClick={handleClose} className="p-1 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 dark:text-slate-500 transition-colors">
             <X className="h-5 w-5" />
           </button>
         </div>
 
         {/* Mode Tabs (hidden during verify) */}
         {!verifyMode && !scanResult && (
-          <div className="flex border-b border-slate-100 shrink-0">
+          <div className="flex border-b border-slate-100 dark:border-slate-700/50 shrink-0">
             <button
               onClick={() => { setMode('scan'); setFile(null); }}
               className={`flex-1 py-3 text-sm font-bold flex items-center justify-center space-x-2 border-b-2 transition-all ${
-                mode === 'scan' ? 'border-indigo-600 text-indigo-600 bg-indigo-50/20' : 'border-transparent text-slate-500 hover:text-slate-800'
+                mode === 'scan' ? 'border-indigo-600 text-indigo-600 bg-indigo-50/20' : 'border-transparent text-slate-500 dark:text-slate-400 dark:text-slate-500 hover:text-slate-800 dark:text-slate-200'
               }`}
             >
               <ScanLine className="h-4 w-4" />
@@ -222,7 +222,7 @@ export default function ReceiptScanner({ onClose, onScanComplete }) {
             <button
               onClick={() => { setMode('manual'); setFile(null); }}
               className={`flex-1 py-3 text-sm font-bold flex items-center justify-center space-x-2 border-b-2 transition-all ${
-                mode === 'manual' ? 'border-indigo-600 text-indigo-600 bg-indigo-50/20' : 'border-transparent text-slate-500 hover:text-slate-800'
+                mode === 'manual' ? 'border-indigo-600 text-indigo-600 bg-indigo-50/20' : 'border-transparent text-slate-500 dark:text-slate-400 dark:text-slate-500 hover:text-slate-800 dark:text-slate-200'
               }`}
             >
               <FileText className="h-4 w-4" />
@@ -238,8 +238,8 @@ export default function ReceiptScanner({ onClose, onScanComplete }) {
               <div className="flex items-center space-x-2 mb-4">
                 <Edit3 className="h-5 w-5 text-indigo-600" />
                 <div>
-                  <h4 className="font-bold text-slate-900 text-md">{t('ocrResults')}</h4>
-                  <p className="text-xs text-slate-400">{t('ocrResultsDesc')}</p>
+                  <h4 className="font-bold text-slate-900 dark:text-slate-50 text-md">{t('ocrResults')}</h4>
+                  <p className="text-xs text-slate-400 dark:text-slate-500">{t('ocrResultsDesc')}</p>
                 </div>
               </div>
 
@@ -255,16 +255,16 @@ export default function ReceiptScanner({ onClose, onScanComplete }) {
 
                 {/* Right: Editable form */}
                 <div className="flex flex-col space-y-3">
-                  <div className="flex items-center justify-between bg-slate-50 rounded-lg px-3 py-2 border border-slate-200">
-                    <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">{t('confidence')}</span>
+                  <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-800/50 rounded-lg px-3 py-2 border border-slate-200 dark:border-slate-600">
+                    <span className="text-xs font-bold text-slate-500 dark:text-slate-400 dark:text-slate-500 uppercase tracking-wider">{t('confidence')}</span>
                     <span className={`text-sm font-bold px-2 py-0.5 rounded ${vConfidence >= 0.8 ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
                       {(vConfidence * 100).toFixed(0)}%
                     </span>
                   </div>
 
                   <div>
-                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">{t('vendor')}</label>
-                    <select value={vVendorId} onChange={(e) => setVVendorId(e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm text-slate-800">
+                    <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">{t('vendor')}</label>
+                    <select value={vVendorId} onChange={(e) => setVVendorId(e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm text-slate-800 dark:text-slate-200">
                       <option value="">{t('selectVendor')}</option>
                       {vendors.map(v => <option key={v.id} value={v.id}>{v.name}</option>)}
                     </select>
@@ -272,25 +272,25 @@ export default function ReceiptScanner({ onClose, onScanComplete }) {
 
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">{t('amount')}</label>
-                      <input type="number" step="0.01" value={vAmount} onChange={(e) => setVAmount(e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm text-slate-800" />
+                      <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">{t('amount')}</label>
+                      <input type="number" step="0.01" value={vAmount} onChange={(e) => setVAmount(e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm text-slate-800 dark:text-slate-200" />
                     </div>
                     <div>
-                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">{t('receiptDate')}</label>
-                      <input type="date" value={vDate} onChange={(e) => setVDate(e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm text-slate-800" />
+                      <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">{t('receiptDate')}</label>
+                      <input type="date" value={vDate} onChange={(e) => setVDate(e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm text-slate-800 dark:text-slate-200" />
                     </div>
                   </div>
 
                   <div>
-                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">{t('filingCategory')}</label>
-                    <select value={vCategory} onChange={(e) => setVCategory(e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm text-slate-800">
+                    <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">{t('filingCategory')}</label>
+                    <select value={vCategory} onChange={(e) => setVCategory(e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm text-slate-800 dark:text-slate-200">
                       {SCAN_CATEGORIES.map(c => <option key={c} value={c}>{catLabel(c)}</option>)}
                     </select>
                   </div>
 
                   <div>
-                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">{t('notesRemarks')}</label>
-                    <textarea rows="2" value={vDescription} onChange={(e) => setVDescription(e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm text-slate-800" />
+                    <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">{t('notesRemarks')}</label>
+                    <textarea rows="2" value={vDescription} onChange={(e) => setVDescription(e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm text-slate-800 dark:text-slate-200" />
                   </div>
 
                   <div className="flex flex-col space-y-2 pt-2">
@@ -305,7 +305,7 @@ export default function ReceiptScanner({ onClose, onScanComplete }) {
                     <button
                       onClick={resetAll}
                       disabled={filing}
-                      className="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg text-sm transition-all"
+                      className="w-full py-2 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold rounded-lg text-sm transition-all"
                     >
                       {t('addAnother')}
                     </button>
@@ -324,32 +324,32 @@ export default function ReceiptScanner({ onClose, onScanComplete }) {
                     <div className={`p-3 rounded-full mb-3 ${scanResult.autoFiled ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600'}`}>
                       {scanResult.autoFiled ? <CheckCircle2 className="h-10 w-10" /> : <AlertCircle className="h-10 w-10" />}
                     </div>
-                    <h4 className="font-bold text-slate-900 text-md">{scanResult.autoFiled ? t('filedSuccess') : t('sentToReview')}</h4>
-                    <p className="text-sm text-slate-500 mt-1 max-w-sm">{scanResult.message}</p>
+                    <h4 className="font-bold text-slate-900 dark:text-slate-50 text-md">{scanResult.autoFiled ? t('filedSuccess') : t('sentToReview')}</h4>
+                    <p className="text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500 mt-1 max-w-sm">{scanResult.message}</p>
                   </div>
                   {scanResult.receipt && (
-                    <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3">
+                    <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-600 rounded-xl p-4 space-y-3">
                       <div className="grid grid-cols-2 gap-y-3 gap-x-4 text-sm">
                         <div>
-                          <span className="text-slate-400 block text-xs">{t('vendor')}</span>
-                          <span className="font-bold text-slate-800">{scanResult.receipt.vendor ? scanResult.receipt.vendor.name : t('unknownVendor')}</span>
+                          <span className="text-slate-400 dark:text-slate-500 block text-xs">{t('vendor')}</span>
+                          <span className="font-bold text-slate-800 dark:text-slate-200">{scanResult.receipt.vendor ? scanResult.receipt.vendor.name : t('unknownVendor')}</span>
                         </div>
                         <div>
-                          <span className="text-slate-400 block text-xs">{t('amount')}</span>
-                          <span className="font-bold text-slate-800">{scanResult.receipt.amount != null ? `${scanResult.receipt.amount.toFixed(2)} MAD / DH` : 'N/A'}</span>
+                          <span className="text-slate-400 dark:text-slate-500 block text-xs">{t('amount')}</span>
+                          <span className="font-bold text-slate-800 dark:text-slate-200">{scanResult.receipt.amount != null ? `${scanResult.receipt.amount.toFixed(2)} MAD / DH` : 'N/A'}</span>
                         </div>
                       </div>
                     </div>
                   )}
-                  <button onClick={resetAll} className="w-full mt-6 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg text-sm transition-all">
+                  <button onClick={resetAll} className="w-full mt-6 py-2.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold rounded-lg text-sm transition-all">
                     {t('addAnother')}
                   </button>
                 </div>
               ) : (
                 <div className="flex flex-col items-center text-center py-4">
                   <div className="p-3 bg-red-100 rounded-full text-red-600 mb-3"><AlertCircle className="h-10 w-10" /></div>
-                  <h4 className="font-bold text-slate-900 text-md">{t('entryFailed')}</h4>
-                  <p className="text-sm text-slate-500 mt-2 max-w-xs">{scanResult.message}</p>
+                  <h4 className="font-bold text-slate-900 dark:text-slate-50 text-md">{t('entryFailed')}</h4>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500 mt-2 max-w-xs">{scanResult.message}</p>
                   <button onClick={resetAll} className="mt-6 px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold transition-all">{t('tryAgain')}</button>
                 </div>
               )}
@@ -367,9 +367,9 @@ export default function ReceiptScanner({ onClose, onScanComplete }) {
                   </div>
                   <div className="flex items-center space-x-3">
                     <RefreshCw className="h-5 w-5 text-indigo-600 animate-spin" />
-                    <span className="text-slate-800 font-semibold text-md">{t('scanning')}</span>
+                    <span className="text-slate-800 dark:text-slate-200 font-semibold text-md">{t('scanning')}</span>
                   </div>
-                  <p className="text-xs text-slate-400 mt-2 text-center">{t('scanningDesc')}</p>
+                  <p className="text-xs text-slate-400 dark:text-slate-500 mt-2 text-center">{t('scanningDesc')}</p>
                 </div>
               ) : (
                 <>
@@ -385,22 +385,22 @@ export default function ReceiptScanner({ onClose, onScanComplete }) {
                     <div className="w-full flex flex-col items-center">
                       {file ? (
                         <div className="w-full">
-                          <div className="relative aspect-video max-h-48 rounded-xl overflow-hidden bg-slate-50 border border-slate-200 flex items-center justify-center p-2 mb-4">
+                          <div className="relative aspect-video max-h-48 rounded-xl overflow-hidden bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-600 flex items-center justify-center p-2 mb-4">
                             <img src={filePreviewUrl} alt="Receipt preview" className="max-h-full max-w-full object-contain" />
                             <button type="button" onClick={() => setFile(null)} className="absolute top-2 right-2 p-1.5 bg-slate-900/70 hover:bg-slate-900 text-white rounded-full"><X className="h-4 w-4" /></button>
                           </div>
-                          <p className="text-sm font-medium text-slate-800 text-center truncate mb-6">{file.name}</p>
+                          <p className="text-sm font-medium text-slate-800 dark:text-slate-200 text-center truncate mb-6">{file.name}</p>
                         </div>
                       ) : (
-                        <div onClick={() => fileInputRef.current?.click()} className="w-full py-10 border-2 border-dashed border-slate-300 hover:border-indigo-500 rounded-xl cursor-pointer bg-slate-50 hover:bg-indigo-50/20 transition-all flex flex-col items-center justify-center p-6 group">
-                          <UploadCloud className="h-12 w-12 text-slate-400 group-hover:text-indigo-600 mb-4" />
-                          <p className="text-sm font-semibold text-slate-700">{t('dragDrop')}</p>
-                          <span className="text-xs text-slate-400 mt-1">{t('fileTypes')}</span>
+                        <div onClick={() => fileInputRef.current?.click()} className="w-full py-10 border-2 border-dashed border-slate-300 hover:border-indigo-500 rounded-xl cursor-pointer bg-slate-50 dark:bg-slate-800/50 hover:bg-indigo-50/20 transition-all flex flex-col items-center justify-center p-6 group">
+                          <UploadCloud className="h-12 w-12 text-slate-400 dark:text-slate-500 group-hover:text-indigo-600 mb-4" />
+                          <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">{t('dragDrop')}</p>
+                          <span className="text-xs text-slate-400 dark:text-slate-500 mt-1">{t('fileTypes')}</span>
                           <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*,application/pdf" capture="environment" className="hidden" />
                         </div>
                       )}
                       <div className="w-full flex space-x-3 mt-6">
-                        <button type="button" onClick={startCamera} className="flex-1 py-2.5 border border-slate-300 hover:bg-slate-50 text-slate-700 font-semibold rounded-lg text-sm flex items-center justify-center space-x-2"><Camera className="h-4 w-4" /><span>{t('useCamera')}</span></button>
+                        <button type="button" onClick={startCamera} className="flex-1 py-2.5 border border-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 dark:bg-slate-800/50 text-slate-700 dark:text-slate-300 font-semibold rounded-lg text-sm flex items-center justify-center space-x-2"><Camera className="h-4 w-4" /><span>{t('useCamera')}</span></button>
                         {file && (
                           <button type="button" onClick={handleScanUpload} className="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg text-sm flex items-center justify-center space-x-2"><Sparkles className="h-4 w-4" /><span>{t('analyzeAI')}</span></button>
                         )}
@@ -416,34 +416,34 @@ export default function ReceiptScanner({ onClose, onScanComplete }) {
           {mode === 'manual' && !scanResult && (
             <form onSubmit={handleManualSubmit} className="w-full space-y-4">
               <div>
-                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">{t('vendor')}</label>
-                <select value={manualVendor} onChange={(e) => setManualVendor(e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm text-slate-800">
+                <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">{t('vendor')}</label>
+                <select value={manualVendor} onChange={(e) => setManualVendor(e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm text-slate-800 dark:text-slate-200">
                   <option value="">{t('selectVendor')}</option>
                   {vendors.map(v => <option key={v.id} value={v.id}>{v.name}</option>)}
                 </select>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">{t('amount')}</label>
-                  <input type="number" step="0.01" required placeholder="0.00" value={manualAmount} onChange={(e) => setManualAmount(e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm text-slate-800" />
+                  <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">{t('amount')}</label>
+                  <input type="number" step="0.01" required placeholder="0.00" value={manualAmount} onChange={(e) => setManualAmount(e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm text-slate-800 dark:text-slate-200" />
                 </div>
                 <div>
-                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">{t('date')}</label>
-                  <input type="date" required value={manualDate} onChange={(e) => setManualDate(e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm text-slate-800" />
+                  <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">{t('date')}</label>
+                  <input type="date" required value={manualDate} onChange={(e) => setManualDate(e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm text-slate-800 dark:text-slate-200" />
                 </div>
               </div>
               <div>
-                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">{t('filingCategory')}</label>
-                <select value={manualCategory} onChange={(e) => setManualCategory(e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm text-slate-800">
+                <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">{t('filingCategory')}</label>
+                <select value={manualCategory} onChange={(e) => setManualCategory(e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm text-slate-800 dark:text-slate-200">
                   {SCAN_CATEGORIES.map(c => <option key={c} value={c}>{catLabel(c)}</option>)}
                 </select>
               </div>
               <div>
-                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">{t('notesRemarks')}</label>
-                <textarea rows="2" placeholder={t('notesPlaceholder')} value={manualDesc} onChange={(e) => setManualDesc(e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm text-slate-800" />
+                <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">{t('notesRemarks')}</label>
+                <textarea rows="2" placeholder={t('notesPlaceholder')} value={manualDesc} onChange={(e) => setManualDesc(e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm text-slate-800 dark:text-slate-200" />
               </div>
               <div>
-                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">{t('receiptImage')}</label>
+                <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">{t('receiptImage')}</label>
                 <input type="file" onChange={handleFileChange} accept="image/*,application/pdf" className="w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:bg-indigo-50 file:text-indigo-700 file:font-semibold" />
               </div>
               <button type="submit" disabled={manualSubmitting} className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-bold rounded-lg text-sm flex items-center justify-center space-x-2">

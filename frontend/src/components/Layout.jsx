@@ -2,12 +2,14 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useLanguage, languages } from '../context/LanguageContext.jsx';
-import { LayoutDashboard, DollarSign, Users, ClipboardCheck, LogOut, Menu, X, Globe, ChevronDown, Receipt } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext.jsx';
+import { LayoutDashboard, DollarSign, Users, ClipboardCheck, LogOut, Menu, X, Globe, ChevronDown, Receipt, Sun, Moon } from 'lucide-react';
 import { AlMohitLogo, AlMohitLogoWide } from './AlMohitLogo.jsx';
 
 export default function Layout({ children }) {
   const { user, logout } = useAuth();
   const { t, lang, changeLanguage } = useLanguage();
+  const { theme, toggleTheme } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -137,6 +139,13 @@ export default function Layout({ children }) {
             <h4 className="text-sm font-semibold text-white truncate">{user?.name}</h4>
             <span className="text-xs text-slate-400 uppercase tracking-widest font-semibold">{user?.role}</span>
           </div>
+          <button
+            onClick={toggleTheme}
+            className="p-2 rounded-lg text-slate-400 hover:text-amber-400 hover:bg-slate-800 transition-all"
+            title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+          >
+            {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          </button>
         </div>
         <button
           onClick={handleLogout}
@@ -185,7 +194,7 @@ export default function Layout({ children }) {
         {sidebarContent}
       </aside>
 
-      <main className="flex-1 md:pl-64 flex flex-col min-h-screen">
+      <main className="flex-1 md:pl-64 flex flex-col min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors">
         <div className="p-4 md:p-8 max-w-7xl w-full mx-auto flex-1">
           {children}
         </div>

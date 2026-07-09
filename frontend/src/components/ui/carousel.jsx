@@ -75,7 +75,7 @@ function CarouselPrevious({ className, ...props }) {
       disabled={!canScrollPrev}
       onClick={scrollPrev}
       className={cn(
-        "absolute touch-manipulation rounded-full inline-flex items-center justify-center h-8 w-8 bg-white border border-slate-200 shadow-md hover:bg-slate-50 text-slate-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all",
+        "absolute touch-manipulation rounded-full inline-flex items-center justify-center h-8 w-8 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 shadow-md hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 disabled:opacity-30 disabled:cursor-not-allowed transition-all",
         orientation === "horizontal" ? "inset-y-0 -left-4 my-auto" : "-top-4 left-1/2 -translate-x-1/2 rotate-90",
         className
       )}
@@ -94,7 +94,7 @@ function CarouselNext({ className, ...props }) {
       disabled={!canScrollNext}
       onClick={scrollNext}
       className={cn(
-        "absolute touch-manipulation rounded-full inline-flex items-center justify-center h-8 w-8 bg-white border border-slate-200 shadow-md hover:bg-slate-50 text-slate-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all",
+        "absolute touch-manipulation rounded-full inline-flex items-center justify-center h-8 w-8 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 shadow-md hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 disabled:opacity-30 disabled:cursor-not-allowed transition-all",
         orientation === "horizontal" ? "inset-y-0 -right-4 my-auto" : "-bottom-4 left-1/2 -translate-x-1/2 rotate-90",
         className
       )}

@@ -55,24 +55,24 @@ export default function ExportModal({ onClose, filters = {} }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-slate-100 flex flex-col">
-        <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+      <div className="bg-white dark:bg-slate-800/90 rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-slate-100 dark:border-slate-700/50 flex flex-col">
+        <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-700/50 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
           <div className="flex items-center space-x-2.5">
             <Settings className="h-5 w-5 text-indigo-600 animate-spin-slow" />
-            <h3 className="font-bold text-slate-900 text-lg">{t('exportTitle')}</h3>
+            <h3 className="font-bold text-slate-900 dark:text-slate-50 text-lg">{t('exportTitle')}</h3>
           </div>
-          <button onClick={onClose} className="p-1 rounded-full hover:bg-slate-200 text-slate-500 transition-colors"><X className="h-5 w-5" /></button>
+          <button onClick={onClose} className="p-1 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 dark:text-slate-500 transition-colors"><X className="h-5 w-5" /></button>
         </div>
 
         <div className="p-6 space-y-5">
           {/* Format */}
           <div>
-            <label className="text-xs font-bold text-slate-400 tracking-wider uppercase block mb-2">{t('exportFormat')}</label>
+            <label className="text-xs font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase block mb-2">{t('exportFormat')}</label>
             <div className="grid grid-cols-2 gap-3">
-              <button type="button" onClick={() => setFormat('excel')} className={`py-3 border-2 rounded-xl flex items-center justify-center space-x-2.5 text-sm font-semibold transition-all ${format === 'excel' ? 'border-emerald-500 bg-emerald-50/30 text-emerald-800' : 'border-slate-200 hover:border-slate-300 text-slate-600'}`}>
+              <button type="button" onClick={() => setFormat('excel')} className={`py-3 border-2 rounded-xl flex items-center justify-center space-x-2.5 text-sm font-semibold transition-all ${format === 'excel' ? 'border-emerald-500 bg-emerald-50/30 text-emerald-800' : 'border-slate-200 dark:border-slate-600 hover:border-slate-300 text-slate-600 dark:text-slate-400 dark:text-slate-500'}`}>
                 <FileSpreadsheet className="h-5 w-5 text-emerald-600" /><span>{t('microsoftExcel')}</span>
               </button>
-              <button type="button" onClick={() => setFormat('pdf')} className={`py-3 border-2 rounded-xl flex items-center justify-center space-x-2.5 text-sm font-semibold transition-all ${format === 'pdf' ? 'border-red-500 bg-red-50/30 text-red-800' : 'border-slate-200 hover:border-slate-300 text-slate-600'}`}>
+              <button type="button" onClick={() => setFormat('pdf')} className={`py-3 border-2 rounded-xl flex items-center justify-center space-x-2.5 text-sm font-semibold transition-all ${format === 'pdf' ? 'border-red-500 bg-red-50/30 text-red-800' : 'border-slate-200 dark:border-slate-600 hover:border-slate-300 text-slate-600 dark:text-slate-400 dark:text-slate-500'}`}>
                 <FileText className="h-5 w-5 text-red-600" /><span>{t('pdfStatement')}</span>
               </button>
             </div>
@@ -80,8 +80,8 @@ export default function ExportModal({ onClose, filters = {} }) {
 
           {/* Scope */}
           <div>
-            <label className="text-xs font-bold text-slate-400 tracking-wider uppercase block mb-2">{t('exportScope')}</label>
-            <select value={scope} onChange={(e) => setScope(e.target.value)} className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
+            <label className="text-xs font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase block mb-2">{t('exportScope')}</label>
+            <select value={scope} onChange={(e) => setScope(e.target.value)} className="w-full border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-800 dark:text-slate-200 font-medium focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
               <option value="combined">{t('combinedStatement')}</option>
               <option value="revenue">{t('revenueOnly')}</option>
               <option value="charges">{t('chargesOnly')}</option>
@@ -91,21 +91,21 @@ export default function ExportModal({ onClose, filters = {} }) {
 
           {/* Time Interval */}
           <div>
-            <label className="text-xs font-bold text-slate-400 tracking-wider uppercase block mb-2">{t('timeInterval')}</label>
+            <label className="text-xs font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase block mb-2">{t('timeInterval')}</label>
             <div className="grid grid-cols-4 gap-2 mb-3">
               {['week', 'month', 'year', 'custom'].map((p) => (
-                <button key={p} type="button" onClick={() => setRange(p)} className={`py-1.5 px-2 rounded-lg text-xs font-bold capitalize transition-all ${range === p ? 'bg-slate-900 text-white' : 'bg-slate-100 hover:bg-slate-200 text-slate-600'}`}>{p === 'custom' ? t('custom') : p === 'week' ? t('weekView') : p === 'month' ? t('monthView') : t('yearView')}</button>
+                <button key={p} type="button" onClick={() => setRange(p)} className={`py-1.5 px-2 rounded-lg text-xs font-bold capitalize transition-all ${range === p ? 'bg-slate-900 text-white' : 'bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300'}`}>{p === 'custom' ? t('custom') : p === 'week' ? t('weekView') : p === 'month' ? t('monthView') : t('yearView')}</button>
               ))}
             </div>
             {range === 'custom' && (
-              <div className="grid grid-cols-2 gap-3 p-3 bg-slate-50 rounded-xl border border-slate-200">
+              <div className="grid grid-cols-2 gap-3 p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-600">
                 <div>
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">{t('startDate')}</span>
-                  <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="w-full text-xs border border-slate-200 rounded px-2 py-1 text-slate-800" />
+                  <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">{t('startDate')}</span>
+                  <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="w-full text-xs border border-slate-200 dark:border-slate-600 rounded px-2 py-1 text-slate-800 dark:text-slate-200" />
                 </div>
                 <div>
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">{t('endDate')}</span>
-                  <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="w-full text-xs border border-slate-200 rounded px-2 py-1 text-slate-800" />
+                  <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">{t('endDate')}</span>
+                  <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="w-full text-xs border border-slate-200 dark:border-slate-600 rounded px-2 py-1 text-slate-800 dark:text-slate-200" />
                 </div>
               </div>
             )}
@@ -114,15 +114,15 @@ export default function ExportModal({ onClose, filters = {} }) {
           {/* Vendor & Category filters */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-xs font-bold text-slate-400 tracking-wider uppercase block mb-2">{t('vendorFilter')}</label>
-              <select value={vendorId} onChange={(e) => setVendorId(e.target.value)} className="w-full border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-700">
+              <label className="text-xs font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase block mb-2">{t('vendorFilter')}</label>
+              <select value={vendorId} onChange={(e) => setVendorId(e.target.value)} className="w-full border border-slate-200 dark:border-slate-600 rounded-lg px-2.5 py-1.5 text-xs text-slate-700 dark:text-slate-300">
                 <option value="">{t('allVendors')}</option>
                 {vendors.map(v => <option key={v.id} value={v.id}>{v.name}</option>)}
               </select>
             </div>
             <div>
-              <label className="text-xs font-bold text-slate-400 tracking-wider uppercase block mb-2">{t('categoryFilter')}</label>
-              <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-700">
+              <label className="text-xs font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase block mb-2">{t('categoryFilter')}</label>
+              <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full border border-slate-200 dark:border-slate-600 rounded-lg px-2.5 py-1.5 text-xs text-slate-700 dark:text-slate-300">
                 <option value="">{t('allCategories')}</option>
                 {EXPORT_CATEGORIES.map(c => <option key={c} value={c}>{catLabel(c)}</option>)}
               </select>
@@ -130,8 +130,8 @@ export default function ExportModal({ onClose, filters = {} }) {
           </div>
         </div>
 
-        <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex space-x-3">
-          <button type="button" onClick={onClose} className="flex-1 py-2 text-center text-slate-500 hover:text-slate-700 text-sm font-semibold">{t('cancel')}</button>
+        <div className="px-6 py-4 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-700/50 flex space-x-3">
+          <button type="button" onClick={onClose} className="flex-1 py-2 text-center text-slate-500 dark:text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:text-slate-300 text-sm font-semibold">{t('cancel')}</button>
           <button type="button" onClick={handleTriggerExport} disabled={exporting} className={`flex-1 py-2 rounded-lg text-sm font-bold text-white shadow-md transition-all ${format === 'excel' ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-red-600 hover:bg-red-700'} disabled:opacity-50`}>
             {exporting ? t('generating') : `${t('exportTo')} ${format.toUpperCase()}`}
           </button>
