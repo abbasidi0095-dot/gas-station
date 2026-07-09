@@ -11,6 +11,10 @@ import SoldGas from './pages/SoldGas.jsx';
 import Workers from './pages/Workers.jsx';
 import Financials from './pages/Financials.jsx';
 import ReviewQueue from './pages/ReviewQueue.jsx';
+import ReceiptHistory from './pages/ReceiptHistory.jsx';
+import ReceiptDetail from './pages/ReceiptDetail.jsx';
+import Invoices from './pages/Invoices.jsx';
+import Settings from './pages/Settings.jsx';
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
@@ -43,6 +47,10 @@ export default function App() {
               <Route path="/financials" element={<ProtectedRoute><Financials /></ProtectedRoute>} />
               <Route path="/workers" element={<ProtectedRoute><Workers /></ProtectedRoute>} />
               <Route path="/review-queue" element={<ProtectedRoute><ReviewQueue /></ProtectedRoute>} />
+              <Route path="/receipts" element={<ProtectedRoute><ReceiptHistory /></ProtectedRoute>} />
+              <Route path="/receipts/:id" element={<ProtectedRoute><ReceiptDetail /></ProtectedRoute>} />
+              <Route path="/invoices" element={<ProtectedRoute><Invoices /></ProtectedRoute>} />
+              <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </BrowserRouter>

@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import path from 'path';
 import fs from 'fs';
@@ -11,19 +12,36 @@ import financialRoutes from './routes/financials.js';
 import receiptRoutes from './routes/receipts.js';
 import dashboardRoutes from './routes/dashboard.js';
 import exportRoutes from './routes/export.js';
+import reportRoutes from './routes/reports.js';
+import invoiceRoutes from './routes/invoices.js';
+import payslipRoutes from './routes/payslips.js';
+import settingRoutes from './routes/settings.js';
 
 const app = express();
 
-// Middleware
+// Security
+app.disable('x-powered-by');
+app.use(helmet());
+
+// CORS
+const ALLOWED_ORIGINS = process.env.CORS_ORIGIN
+  ? process.env.CORS_ORIGIN.split(',')
+  : ['http://localhost:5173', 'http://localhost:5000'];
 app.use(cors({
-  origin: true, // Echoes request origin in development
+  origin: (origin, cb) => {
+    if (!origin || ALLOWED_ORIGINS.includes(origin)) return cb(null, true);
+    return cb(null, false);
+  },
   credentials: true,
 }));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// Serve static receipt uploads
+// Serve static assets and receipt uploads
+const assetsPath = path.join(process.cwd(), 'assets');
+app.use('/assets', express.static(assetsPath));
 const uploadsPath = path.join(process.cwd(), 'uploads');
 app.use('/uploads', express.static(uploadsPath));
 
@@ -34,6 +52,10 @@ app.use('/api/financials', financialRoutes);
 app.use('/api/receipts', receiptRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/export', exportRoutes);
+app.use('/api/reports', reportRoutes);
+app.use('/api/invoices', invoiceRoutes);
+app.use('/api/payslips', payslipRoutes);
+app.use('/api/settings', settingRoutes);
 
 // Fallback Route
 app.get('/api/health', (req, res) => {

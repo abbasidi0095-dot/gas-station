@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 import app from './app.js';
+import { startScheduler } from './services/scheduler.js';
 
 // Load environment variables
 dotenv.config();
@@ -12,6 +13,8 @@ const server = app.listen(PORT, () => {
   console.log(` Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`=============================================`);
 });
+
+startScheduler();
 
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (err) => {

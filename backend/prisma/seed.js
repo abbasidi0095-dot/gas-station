@@ -25,7 +25,7 @@ async function main() {
   const passwordHash = await bcrypt.hash('salami2026', salt);
 
   await prisma.user.create({
-    data: { name: 'Station Admin', email: 'admin@gas.com', passwordHash, role: 'admin' },
+    data: { name: 'Salami Hassan', email: 'admin@gas.com', passwordHash, role: 'admin' },
   });
   console.log('Admin seeded: admin@gas.com / salami2026');
 

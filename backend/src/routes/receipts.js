@@ -371,15 +371,52 @@ router.put('/review/:id', authenticate, isAdmin, async (req, res) => {
 
 // GET /api/receipts
 router.get('/', authenticate, isAdmin, async (req, res) => {
+  const { status, purpose, page = '1', limit = '20' } = req.query;
+  const skip = (Math.max(1, parseInt(page)) - 1) * parseInt(limit);
+
+  const where = {};
+  if (status) where.status = status;
+  if (purpose) where.purpose = purpose;
+
   try {
-    const receipts = await prisma.receipt.findMany({
-      include: { vendor: true, user: { select: { name: true } } },
-      orderBy: { scannedAt: 'desc' },
-    });
-    return res.json(receipts);
+    const [receipts, total] = await Promise.all([
+      prisma.receipt.findMany({
+        where,
+        include: { vendor: true, user: { select: { name: true } } },
+        orderBy: { scannedAt: 'desc' },
+        skip,
+        take: Math.min(parseInt(limit), 100),
+      }),
+      prisma.receipt.count({ where }),
+    ]);
+    return res.json({ receipts, total, page: parseInt(page), limit: parseInt(limit) });
   } catch (error) {
     console.error('Fetch receipts history error:', error);
     return res.status(500).json({ error: 'Failed to retrieve receipt history.' });
+  }
+});
+
+// GET /api/receipts/:id
+router.get('/:id', authenticate, isAdmin, async (req, res) => {
+  try {
+    const receipt = await prisma.receipt.findUnique({
+      where: { id: req.params.id },
+      include: {
+        vendor: true,
+        user: { select: { name: true } },
+        charge: { include: { vendor: true } },
+        revenue: { include: { vendor: true } },
+      },
+    });
+
+    if (!receipt) {
+      return res.status(404).json({ error: 'Reçu introuvable.' });
+    }
+
+    return res.json(receipt);
+  } catch (error) {
+    console.error('Fetch receipt detail error:', error);
+    return res.status(500).json({ error: 'Erreur lors de la récupération du reçu.' });
   }
 });
 

@@ -21,9 +21,10 @@ model User {
 model Worker {
   id        String    @id @default(uuid())
   name      String
-  cin       String    // Carte d'Identite Nationale
+  cin       String
   position  String
   phone     String
+  email     String?
   hireDate  DateTime
   active    Boolean   @default(true)
   payments  Payment[]
@@ -44,7 +45,7 @@ model Payment {
 
 model Vendor {
   id       String    @id @default(uuid())
-  name     String    @unique // "Almohit" | "Afriquia"
+  name     String    @unique
   receipts Receipt[]
   charges  Charge[]
   revenue  Revenue[]
@@ -57,12 +58,12 @@ model Receipt {
   vendor           Vendor?  @relation(fields: [vendorId], references: [id])
   amount           Float?
   currency         String?  @default("MAD")
-  date             String?  // OCR-extracted receipt date in YYYY-MM-DD
+  date             String?
   extractedRawText String?
   confidenceScore  Float?
-  status           String   // "pending_review" | "confirmed" | "rejected"
-  purpose          String   @default("expense") // "expense" | "revenue"
-  fuelType         String?  // "gasoil" | "essence" | undefined
+  status           String
+  purpose          String   @default("expense")
+  fuelType         String?
   scannedBy        String
   user             User     @relation("ScannedBy", fields: [scannedBy], references: [id])
   scannedAt        DateTime @default(now())
@@ -76,9 +77,11 @@ model Charge {
   vendor      Vendor?  @relation(fields: [vendorId], references: [id])
   receiptId   String?  @unique
   receipt     Receipt? @relation(fields: [receiptId], references: [id], onDelete: SetNull)
+  invoiceId   String?
+  invoice     Invoice? @relation(fields: [invoiceId], references: [id])
   payment     Payment?
   amount      Float
-  category    String   // "fuel_purchase" | "maintenance" | "salary" | "other"
+  category    String
   date        DateTime
   description String?
   createdBy   String
@@ -87,8 +90,8 @@ model Charge {
 model Revenue {
   id          String   @id @default(uuid())
   amount      Float
-  category    String   // "fuel_sales" | "shop_sales" | "services" | "other"
-  fuelType    String?  // "gasoil" | "essence" | undefined
+  category    String
+  fuelType    String?
   date        DateTime
   description String?
   createdBy   String
@@ -97,4 +100,27 @@ model Revenue {
   vendor      Vendor?  @relation(fields: [vendorId], references: [id])
   receiptId   String?  @unique
   receipt     Receipt? @relation(fields: [receiptId], references: [id], onDelete: SetNull)
+}
+
+model Invoice {
+  id            String   @id @default(uuid())
+  invoiceNumber Int      @unique
+  createdAt     DateTime @default(now())
+  status        String   @default("generated") // generated | sent | merged_into
+  sentTo        String?
+  sentAt        DateTime?
+  type          String   @default("single")    // single | consolidated
+  mergedIntoId  String?
+  charges       Charge[]
+}
+
+model Setting {
+  id    String @id @default(uuid())
+  key   String @unique
+  value String
+}
+
+model Sequence {
+  id    String @id
+  value Int
 }

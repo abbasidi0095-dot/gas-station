@@ -344,7 +344,7 @@ export async function generateExcelExport({ range, startDate, endDate, revenues,
 }
 
 export async function generatePDFExport({ range, startDate, endDate, revenues, charges, receipts, totals }) {
-  const almohitPng = await svgToPngBuffer('./assets/almohit-mark.svg', 42);
+  const almohitPng = fs.readFileSync('./assets/logo-hires-full.png');
 
   return new Promise((resolve, reject) => {
     try {
