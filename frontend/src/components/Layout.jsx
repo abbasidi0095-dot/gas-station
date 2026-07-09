@@ -93,7 +93,7 @@ export default function Layout({ children }) {
 
   const sidebarContent = (
     <div className="flex flex-col h-full bg-slate-900 text-slate-100 p-4">
-      <div className="flex items-center space-x-3 px-2 py-4 border-b border-slate-800">
+      <div className="hidden md:flex items-center space-x-3 px-2 py-4 border-b border-slate-800">
         <AlMohitLogo className="h-9 w-9 shrink-0" variant="light" />
         <div className="min-w-0">
           <AlMohitLogoWide className="h-6" variant="light" />
