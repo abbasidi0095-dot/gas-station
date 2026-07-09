@@ -1,5 +1,13 @@
 import ExcelJS from 'exceljs';
 import PDFDocument from 'pdfkit';
+import fs from 'fs';
+import sharp from 'sharp';
+
+async function svgToPngBuffer(svgPath, width) {
+  const svg = fs.readFileSync(svgPath);
+  const buf = await sharp(svg).resize({ width }).png().toBuffer();
+  return buf;
+}
 
 function groupByDate(records) {
   const map = {};
@@ -331,7 +339,12 @@ export async function generateExcelExport({ range, startDate, endDate, revenues,
   return buffer;
 }
 
-export function generatePDFExport({ range, startDate, endDate, revenues, charges, receipts, totals }) {
+export async function generatePDFExport({ range, startDate, endDate, revenues, charges, receipts, totals }) {
+  const [almohitPng, afriquiaPng] = await Promise.all([
+    svgToPngBuffer('./assets/almohit-mark.svg', 40),
+    svgToPngBuffer('./assets/afriquia-logo.svg', 100),
+  ]);
+
   return new Promise((resolve, reject) => {
     try {
       const doc = new PDFDocument({ margin: 50 });
@@ -344,7 +357,7 @@ export function generatePDFExport({ range, startDate, endDate, revenues, charges
       let addingFooter = false;
 
       // Page 1 footer (pageAdded doesn't fire for the initial page)
-      doc.fillColor('#7F7F7F').fontSize(8).text(`Page 1 — Al Mohit Gas Station`, 56, 732, { align: 'center', width: 488 });
+      doc.fillColor('#7F7F7F').fontSize(8).text(`Page 1 — Station Al Mohit`, 56, 732, { align: 'center', width: 488 });
       doc.y = 50;
 
       doc.on('pageAdded', () => {
@@ -352,7 +365,7 @@ export function generatePDFExport({ range, startDate, endDate, revenues, charges
         addingFooter = true;
         pageNum++;
         const y = doc.y;
-        doc.fillColor('#7F7F7F').fontSize(8).text(`Page ${pageNum} — Al Mohit Gas Station`, 56, 732, { align: 'center', width: 488 });
+        doc.fillColor('#7F7F7F').fontSize(8).text(`Page ${pageNum} — Station Al Mohit`, 56, 732, { align: 'center', width: 488 });
         doc.y = y;
         addingFooter = false;
       });
@@ -360,25 +373,30 @@ export function generatePDFExport({ range, startDate, endDate, revenues, charges
       const formattedStart = new Date(startDate).toLocaleDateString();
       const formattedEnd = new Date(endDate).toLocaleDateString();
 
-      doc.fillColor('#1F4E78').fontSize(20).font('Helvetica-Bold').text('AL MOHIT GAS STATION STATEMENT', { align: 'center' });
+      // Logo row
+      doc.image(almohitPng, 200, 45, { width: 40 });
+      doc.image(afriquiaPng, 262, 45, { width: 100 });
+      doc.y = 95;
+
+      doc.fillColor('#1F4E78').fontSize(18).font('Helvetica-Bold').text('RELEVÉ DE LA STATION AL MOHIT', { align: 'center' });
       doc.moveTo(50, doc.y).lineTo(562, doc.y).strokeColor('#1F4E78').lineWidth(1.5).stroke();
       doc.moveDown(1);
 
       doc.fillColor('#555').fontSize(10).font('Helvetica');
-      doc.text(`Period: ${formattedStart}  —  ${formattedEnd}`);
-      doc.text(`Generated: ${new Date().toLocaleString()}`);
+      doc.text(`Période : ${formattedStart}  —  ${formattedEnd}`);
+      doc.text(`Généré le : ${new Date().toLocaleString()}`);
       doc.moveDown(1);
 
       doc.fontSize(11).fillColor('#262626').font('Helvetica-Bold');
       const isProfitable = totals.netProfit >= 0;
       const metricY = doc.y + 2;
-      doc.text(`Total Revenue:`, 50, metricY);
-      doc.text(`${totals.totalRevenue.toFixed(2)} MAD / DH`, 230, metricY);
-      doc.text(`Total Expenses:`, 350, metricY);
-      doc.text(`${totals.totalCharges.toFixed(2)} MAD / DH`, 480, metricY);
-      doc.text(`Net Profit:`, 50, metricY + 18);
-      doc.fillColor(isProfitable ? '#375623' : '#C00000').text(`${totals.netProfit.toFixed(2)} MAD / DH`, 230, metricY + 18);
-      doc.fillColor('#262626').text(`${revenues.length} rev. ops  ·  ${charges.length} exp. entries`, 350, metricY + 18, { fontSize: 9 });
+      doc.text(`Revenu Total :`, 50, metricY);
+      doc.text(`${totals.totalRevenue.toFixed(2)} DH`, 230, metricY);
+      doc.text(`Total Dépenses :`, 350, metricY);
+      doc.text(`${totals.totalCharges.toFixed(2)} DH`, 480, metricY);
+      doc.text(`Bénéfice Net :`, 50, metricY + 18);
+      doc.fillColor(isProfitable ? '#375623' : '#C00000').text(`${totals.netProfit.toFixed(2)} DH`, 230, metricY + 18);
+      doc.fillColor('#262626').text(`${revenues.length} op. rev.  ·  ${charges.length} ent. dép.`, 350, metricY + 18, { fontSize: 9 });
       doc.moveTo(50, metricY + 42).lineTo(562, metricY + 42).strokeColor('#CCC').lineWidth(0.5).stroke();
       doc.y = metricY + 50;
       doc.fillColor('#262626');
@@ -388,16 +406,16 @@ export function generatePDFExport({ range, startDate, endDate, revenues, charges
       if (revenues.length > 0) {
         if (doc.y > 500) doc.addPage();
 
-        doc.fillColor('#375623').fontSize(13).font('Helvetica-Bold').text('REVENUE — OPERATION BY OPERATION', 50, doc.y);
+        doc.fillColor('#375623').fontSize(13).font('Helvetica-Bold').text('REVENU — OPÉRATION PAR OPÉRATION', 50, doc.y);
         doc.moveDown(0.5);
 
         let y = doc.y;
         doc.rect(50, y, 512, 20).fillColor('#375623').fill();
         doc.fillColor('#FFFFFF').fontSize(8).font('Helvetica-Bold');
         doc.text('Date', 55, y + 6);
-        doc.text('Vendor', 120, y + 6);
-        doc.text('Category', 200, y + 6);
-        doc.text('Amount', 460, y + 6, { align: 'right' });
+        doc.text('Fournisseur', 120, y + 6);
+        doc.text('Catégorie', 200, y + 6);
+        doc.text('Montant', 460, y + 6, { align: 'right' });
 
         y += 22;
         doc.fillColor('#333333').font('Helvetica');
@@ -422,8 +440,8 @@ export function generatePDFExport({ range, startDate, endDate, revenues, charges
           const dayTotal = group.records.reduce((s, r) => s + r.amount, 0);
           doc.rect(50, y, 512, 18).fillColor('#E8F5E9').fill();
           doc.fillColor('#1B5E20').fontSize(8).font('Helvetica-Bold');
-          doc.text(`Daily Total — ${group.date}`, 55, y + 5);
-          doc.text(`${dayTotal.toFixed(2)} MAD / DH`, 430, y + 5, { width: 120, align: 'right' });
+          doc.text(`Total Journalier — ${group.date}`, 55, y + 5);
+          doc.text(`${dayTotal.toFixed(2)} DH`, 430, y + 5, { width: 120, align: 'right' });
           y += 20;
         }
 
@@ -432,8 +450,8 @@ export function generatePDFExport({ range, startDate, endDate, revenues, charges
         const grandTotal = revenues.reduce((s, r) => s + r.amount, 0);
         doc.rect(50, y, 512, 20).fillColor('#1B5E20').fill();
         doc.fillColor('#FFFFFF').fontSize(9).font('Helvetica-Bold');
-        doc.text(`GRAND TOTAL — ${revenues.length} operations`, 55, y + 6);
-        doc.text(`${grandTotal.toFixed(2)} MAD / DH`, 430, y + 6, { width: 120, align: 'right' });
+        doc.text(`TOTAL GÉNÉRAL — ${revenues.length} opérations`, 55, y + 6);
+        doc.text(`${grandTotal.toFixed(2)} DH`, 430, y + 6, { width: 120, align: 'right' });
         doc.y = Math.min(y + 30, doc.page.height - 100);
         doc.fillColor('#262626');
       }
@@ -442,16 +460,16 @@ export function generatePDFExport({ range, startDate, endDate, revenues, charges
       if (charges.length > 0) {
         if (doc.y > 500) doc.addPage();
 
-        doc.fillColor('#C00000').fontSize(13).font('Helvetica-Bold').text('OPERATING CHARGES & EXPENSES', 50, doc.y);
+        doc.fillColor('#C00000').fontSize(13).font('Helvetica-Bold').text('FRAIS & DÉPENSES D\'EXPLOITATION', 50, doc.y);
         doc.moveDown(0.5);
 
         let y = doc.y;
         doc.rect(50, y, 512, 20).fillColor('#C00000').fill();
         doc.fillColor('#FFFFFF').fontSize(9).font('Helvetica-Bold');
         doc.text('Date', 55, y + 6);
-        doc.text('Vendor', 150, y + 6);
-        doc.text('Category', 280, y + 6);
-        doc.text('Amount (MAD / DH)', 460, y + 6, { align: 'right' });
+        doc.text('Fournisseur', 150, y + 6);
+        doc.text('Catégorie', 280, y + 6);
+        doc.text('Montant (DH)', 460, y + 6, { align: 'right' });
 
         y += 22;
 
@@ -461,7 +479,7 @@ export function generatePDFExport({ range, startDate, endDate, revenues, charges
           doc.rect(50, y, 512, 16).fillColor(y % 32 === 0 ? '#FFFFFF' : '#FBF9F9').fill();
           doc.fillColor('#333333').fontSize(8);
           doc.text(new Date(c.date).toLocaleDateString(), 55, y + 4);
-          doc.text(c.vendor ? c.vendor.name : 'Other / Non-Vendor', 150, y + 4);
+          doc.text(c.vendor ? c.vendor.name : 'Autre / Sans Fournisseur', 150, y + 4);
           doc.text(c.category.replace('_', ' ').toUpperCase(), 280, y + 4);
           doc.text(c.amount.toFixed(2), 440, y + 4, { width: 120, align: 'right' });
           y += 16;
@@ -472,8 +490,8 @@ export function generatePDFExport({ range, startDate, endDate, revenues, charges
         const expTotal = charges.reduce((s, c) => s + c.amount, 0);
         doc.rect(50, y, 512, 20).fillColor('#C00000').fill();
         doc.fillColor('#FFFFFF').fontSize(9).font('Helvetica-Bold');
-        doc.text(`TOTAL EXPENSES — ${charges.length} entries`, 55, y + 6);
-        doc.text(`${expTotal.toFixed(2)} MAD / DH`, 440, y + 6, { width: 120, align: 'right' });
+        doc.text(`TOTAL DÉPENSES — ${charges.length} entrées`, 55, y + 6);
+        doc.text(`${expTotal.toFixed(2)} DH`, 440, y + 6, { width: 120, align: 'right' });
         doc.y = Math.min(y + 30, doc.page.height - 100);
       }
 
@@ -501,15 +519,15 @@ export function generatePDFExport({ range, startDate, endDate, revenues, charges
           if (doc.y > 500) doc.addPage();
 
           const headerColor = vName === 'Al Mohit' ? '#C00000' : '#2F5597';
-          doc.fillColor(headerColor).fontSize(13).font('Helvetica-Bold').text(`${vName} — Revenue Breakdown`, 50, doc.y);
+          doc.fillColor(headerColor).fontSize(13).font('Helvetica-Bold').text(`${vName} — Répartition des Revenus`, 50, doc.y);
           doc.moveDown(0.5);
 
           let y = doc.y;
           doc.rect(50, y, 512, 20).fillColor(headerColor).fill();
           doc.fillColor('#FFFFFF').fontSize(8).font('Helvetica-Bold');
           doc.text('Date', 55, y + 6);
-          doc.text('Category', 120, y + 6);
-          doc.text('Amount', 460, y + 6, { align: 'right' });
+          doc.text('Catégorie', 120, y + 6);
+          doc.text('Montant', 460, y + 6, { align: 'right' });
 
           y += 22;
           doc.fillColor('#333333').font('Helvetica');
@@ -532,8 +550,8 @@ export function generatePDFExport({ range, startDate, endDate, revenues, charges
             const subBg = vName === 'Al Mohit' ? '#FFCDD2' : '#C5CAE9';
             doc.rect(50, y, 512, 18).fillColor(subBg).fill();
             doc.fillColor(vName === 'Al Mohit' ? '#B71C1C' : '#1A237E').fontSize(8).font('Helvetica-Bold');
-            doc.text(`Daily Total — ${group.date}`, 55, y + 5);
-            doc.text(`${dayTotal.toFixed(2)} MAD / DH`, 430, y + 5, { width: 120, align: 'right' });
+            doc.text(`Total Journalier — ${group.date}`, 55, y + 5);
+            doc.text(`${dayTotal.toFixed(2)} DH`, 430, y + 5, { width: 120, align: 'right' });
             y += 20;
           }
 
@@ -542,8 +560,8 @@ export function generatePDFExport({ range, startDate, endDate, revenues, charges
           const totalBg = vName === 'Al Mohit' ? '#C00000' : '#1A237E';
           doc.rect(50, y, 512, 20).fillColor(totalBg).fill();
           doc.fillColor('#FFFFFF').fontSize(9).font('Helvetica-Bold');
-          doc.text(`${vName} TOTAL — ${vRevs.length} operations`, 55, y + 6);
-          doc.text(`${vTotal.toFixed(2)} MAD / DH`, 430, y + 6, { width: 120, align: 'right' });
+          doc.text(`${vName} TOTAL — ${vRevs.length} opérations`, 55, y + 6);
+          doc.text(`${vTotal.toFixed(2)} DH`, 430, y + 6, { width: 120, align: 'right' });
           doc.y = Math.min(y + 30, doc.page.height - 100);
           doc.fillColor('#262626');
         }
