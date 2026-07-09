@@ -18,6 +18,79 @@ export default function Layout({ children }) {
   const [langOpen, setLangOpen] = useState(false);
   const langRef = useRef(null);
 
+  const [quickPanelOpen, setQuickPanelOpen] = useState(false);
+  const [quickText, setQuickText] = useState('');
+  const [quickLoading, setQuickLoading] = useState(false);
+  const [quickMessage, setQuickMessage] = useState(null);
+  const [quickContext, setQuickContext] = useState(null);
+  const [chatHistory, setChatHistory] = useState([]);
+
+  useEffect(() => {
+    const handleOpen = () => {
+      handleResetQuickAdd();
+      setQuickPanelOpen(true);
+    };
+    window.addEventListener('open-quick-add', handleOpen);
+    return () => window.removeEventListener('open-quick-add', handleOpen);
+  }, []);
+
+  const submitQuickText = async (textValue) => {
+    if (!textValue.trim()) return;
+
+    setChatHistory(prev => [...prev, { sender: 'user', text: textValue }]);
+    setQuickLoading(true);
+    setQuickText('');
+    setQuickMessage(null);
+
+    try {
+      const res = await fetch('/api/financials/quick-add', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: textValue, context: quickContext }),
+      });
+      const resData = await res.json();
+      if (!res.ok) throw new Error(resData.error || 'Erreur lors du traitement par l\'IA.');
+
+      if (resData.status === 'incomplete') {
+        setQuickContext(resData.context);
+        setChatHistory(prev => [...prev, {
+          sender: 'ai',
+          text: resData.prompt,
+          options: resData.options || [],
+          partial: resData.context.partialTransaction
+        }]);
+      } else {
+        setQuickContext(null);
+        setChatHistory(prev => [...prev, { sender: 'ai', text: resData.message, isComplete: true }]);
+        setQuickMessage({ type: 'success', text: resData.message });
+        window.dispatchEvent(new CustomEvent('scan-complete'));
+      }
+    } catch (err) {
+      console.error(err);
+      setQuickMessage({ type: 'error', text: err.message });
+      setChatHistory(prev => [...prev, { sender: 'ai', text: `Erreur: ${err.message}`, isError: true }]);
+    } finally {
+      setQuickLoading(false);
+    }
+  };
+
+  const handleQuickAdd = async (e) => {
+    e.preventDefault();
+    if (!quickText.trim()) return;
+    await submitQuickText(quickText);
+  };
+
+  const triggerOptionClick = async (opt) => {
+    await submitQuickText(opt);
+  };
+
+  const handleResetQuickAdd = () => {
+    setQuickText('');
+    setQuickContext(null);
+    setChatHistory([]);
+    setQuickMessage(null);
+  };
+
 
 
   useEffect(() => {
@@ -204,6 +277,173 @@ export default function Layout({ children }) {
           {children}
         </div>
       </main>
+
+      {user && (
+        <>
+          {/* Floating Saisie Rapide (IA) Button */}
+          <button
+            onClick={() => { handleResetQuickAdd(); setQuickPanelOpen(true); }}
+            className="fixed bottom-6 right-6 z-40 flex items-center justify-center space-x-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm px-4 py-3.5 rounded-full shadow-2xl hover:shadow-indigo-600/40 hover:-translate-y-0.5 active:translate-y-0 transition-all group"
+            title="Saisie Rapide IA"
+          >
+            <Sparkles className="h-5 w-5 text-indigo-200 group-hover:animate-pulse" />
+            <span className="hidden sm:inline-block pr-1">Saisie Rapide IA</span>
+          </button>
+
+          {/* Saisie Rapide IA Conversational Assistant Drawer Overlay */}
+          {quickPanelOpen && (
+            <div className="fixed inset-0 z-50 flex justify-end bg-slate-950/40 backdrop-blur-sm transition-all duration-300">
+              <div className="w-full max-w-lg h-full bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 shadow-2xl flex flex-col overflow-hidden relative">
+                
+                {/* Drawer Header */}
+                <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-955/45">
+                  <div className="flex items-center space-x-2.5">
+                    <div className="h-9 w-9 rounded-xl bg-indigo-100 dark:bg-indigo-950/60 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+                      <Sparkles className="h-5 w-5 animate-pulse" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-slate-900 dark:text-slate-50 text-sm leading-none">Assistant Saisie Rapide (IA)</h3>
+                      <span className="text-[10px] text-emerald-500 font-bold flex items-center mt-1">
+                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-ping mr-1" />
+                        En ligne · Prêt
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <button onClick={handleResetQuickAdd} className="px-2.5 py-1 text-[10px] font-bold text-indigo-600 hover:text-indigo-700 bg-indigo-50 dark:bg-indigo-950/50 rounded-lg transition-colors" title="Réinitialiser la transaction">
+                      Réinitialiser
+                    </button>
+                    <button type="button" onClick={() => setQuickPanelOpen(false)} className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg bg-slate-100 dark:bg-slate-800 transition-colors">
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Conversational Feed */}
+                <div className="flex-1 p-6 overflow-y-auto space-y-4">
+                  
+                  {/* Default Welcome Message */}
+                  {chatHistory.length === 0 && (
+                    <div className="space-y-4">
+                      <div className="p-4 bg-slate-50 dark:bg-slate-800/40 rounded-2xl border border-slate-100 dark:border-slate-800">
+                        <p className="text-xs font-semibold text-slate-700 dark:text-slate-300 leading-relaxed">
+                          Bonjour Mr Salami. Écrivez n'importe quelle opération en langage naturel, et je m'occupe de l'analyser et de l'enregistrer dans les comptes !
+                        </p>
+                        <p className="text-xs text-slate-500 mt-2">
+                          Si vous oubliez le montant, le fournisseur ou la date, pas d'inquiétude, je vous demanderai de me préciser les détails manquants un par un !
+                        </p>
+                      </div>
+
+                      {/* Suggestions list */}
+                      <div className="space-y-2">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Exemples de saisie :</span>
+                        {[
+                          "Vente Gasoil Al Mohit 12500 DH hier",
+                          "Achat carburant Afriquia 60000 DH",
+                          "Salaire Hassan 2500 DH",
+                          "Facture eau et électricité Lydec",
+                          "Achat produits de nettoyage 800 DH"
+                        ].map((example) => (
+                          <button
+                            key={example}
+                            onClick={() => setQuickText(example)}
+                            className="w-full text-left p-3 rounded-xl border border-slate-100 dark:border-slate-800 hover:bg-indigo-50/40 dark:hover:bg-indigo-950/20 text-xs text-slate-600 dark:text-slate-400 font-semibold transition-all hover:border-indigo-200/50"
+                          >
+                            ⚡ "{example}"
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Chat turns */}
+                  {chatHistory.map((turn, i) => (
+                    <div key={i} className={`flex flex-col ${turn.sender === 'user' ? 'items-end' : 'items-start'} space-y-1.5`}>
+                      <div className={`p-4 rounded-2xl max-w-[85%] text-xs font-medium leading-relaxed shadow-sm ${
+                        turn.sender === 'user'
+                          ? 'bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-955 rounded-br-none'
+                          : turn.isComplete
+                          ? 'bg-emerald-50 dark:bg-emerald-950/20 text-emerald-900 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-900/30 rounded-bl-none'
+                          : turn.isError
+                          ? 'bg-red-50 dark:bg-red-950/20 text-red-900 dark:text-red-400 border border-red-100 dark:border-red-900/30 rounded-bl-none'
+                          : 'bg-indigo-50 dark:bg-indigo-950/30 text-indigo-955 dark:text-indigo-200 border border-indigo-100 dark:border-indigo-900/50 rounded-bl-none'
+                      }`}>
+                        {turn.text}
+                      </div>
+
+                      {/* If turn has choices and it's the latest message, show clickable buttons! */}
+                      {turn.options && turn.options.length > 0 && i === chatHistory.length - 1 && !quickLoading && (
+                        <div className="flex flex-wrap gap-2 mt-1.5 max-w-[85%]">
+                          {turn.options.map((opt, idx) => (
+                            <button
+                              key={idx}
+                              type="button"
+                              onClick={() => triggerOptionClick(opt)}
+                              className="px-3.5 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 dark:bg-indigo-950/50 dark:hover:bg-indigo-900/40 dark:text-indigo-300 rounded-xl text-[11px] font-bold transition-all shadow-sm border border-indigo-100/50 dark:border-indigo-900/30 active:scale-95"
+                            >
+                              {opt}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* If turn is AI and has partially extracted transaction, display it beautifully! */}
+                      {turn.partial && (
+                        <div className="p-3 bg-slate-50 dark:bg-slate-800/35 rounded-xl border border-slate-100 dark:border-slate-800 text-[10px] w-full max-w-[80%] space-y-1">
+                          <span className="font-bold text-slate-400 uppercase tracking-widest block mb-1">Informations Extraites :</span>
+                          <div className="grid grid-cols-2 gap-2 text-slate-600 dark:text-slate-400 font-bold">
+                            <div>Type: <span className="text-indigo-600 dark:text-indigo-400 capitalize">{turn.partial.type || 'Inconnu'}</span></div>
+                            <div>Montant: <span className="text-slate-900 dark:text-slate-50 font-black">{turn.partial.amount ? `${turn.partial.amount.toFixed(2)} DH` : 'Manquant ❌'}</span></div>
+                            <div>Catégorie: <span className="text-slate-900 dark:text-slate-50 capitalize">{turn.partial.category ? catLabel(turn.partial.category) : 'Manquant ❌'}</span></div>
+                            <div>Date: <span className="text-slate-900 dark:text-slate-50">{turn.partial.date || 'Manquante ❌'}</span></div>
+                            <div className="col-span-2">Fournisseur/Employé: <span className="text-slate-900 dark:text-slate-50">{turn.partial.workerName || turn.partial.vendor || 'Manquant ❌'}</span></div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+
+                  {/* Loader */}
+                  {quickLoading && (
+                    <div className="flex items-center space-x-2 text-slate-400 dark:text-slate-505">
+                      <div className="h-5 w-5 border-2 border-slate-400 border-t-transparent rounded-full animate-spin" />
+                      <span className="text-xs font-semibold animate-pulse">L'IA réfléchit...</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Input Bar */}
+                <div className="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/45">
+                  <form onSubmit={handleQuickAdd} className="flex gap-2">
+                    <input
+                      type="text"
+                      required
+                      value={quickText}
+                      onChange={(e) => setQuickText(e.target.value)}
+                      disabled={quickLoading}
+                      placeholder={
+                        quickContext 
+                          ? "Répondez à la question de l'IA..." 
+                          : "Saisissez l'opération ici..."
+                      }
+                      className="flex-1 px-4 py-2.5 rounded-xl border dark:border-slate-700 bg-white dark:bg-slate-900 text-xs focus:ring-2 focus:ring-indigo-500 outline-none transition-all placeholder:text-slate-400"
+                    />
+                    <button
+                      type="submit"
+                      disabled={quickLoading || !quickText.trim()}
+                      className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-md disabled:opacity-50 flex items-center justify-center space-x-1 transition-all"
+                    >
+                      <Sparkles className="h-3.5 w-3.5" />
+                      <span>Envoyer</span>
+                    </button>
+                  </form>
+                </div>
+
+              </div>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }
