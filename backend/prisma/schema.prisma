@@ -1,0 +1,97 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id           String    @id @default(uuid())
+  name         String
+  email        String    @unique
+  passwordHash String
+  role         String    // "admin"
+  createdAt    DateTime  @default(now())
+  scanned      Receipt[] @relation("ScannedBy")
+  payments     Payment[] @relation("PaymentCreatedBy")
+}
+
+model Worker {
+  id        String    @id @default(uuid())
+  name      String
+  cin       String    // Carte d'Identite Nationale
+  position  String
+  phone     String
+  hireDate  DateTime
+  active    Boolean   @default(true)
+  payments  Payment[]
+}
+
+model Payment {
+  id          String   @id @default(uuid())
+  workerId    String
+  worker      Worker   @relation(fields: [workerId], references: [id], onDelete: Cascade)
+  amount      Float
+  date        DateTime
+  description String?
+  createdBy   String
+  user        User     @relation("PaymentCreatedBy", fields: [createdBy], references: [id])
+  charge      Charge?  @relation(fields: [chargeId], references: [id], onDelete: SetNull)
+  chargeId    String?  @unique
+}
+
+model Vendor {
+  id       String    @id @default(uuid())
+  name     String    @unique // "Almohit" | "Afriquia"
+  receipts Receipt[]
+  charges  Charge[]
+  revenue  Revenue[]
+}
+
+model Receipt {
+  id               String   @id @default(uuid())
+  imageUrl         String
+  vendorId         String?
+  vendor           Vendor?  @relation(fields: [vendorId], references: [id])
+  amount           Float?
+  currency         String?  @default("MAD")
+  extractedRawText String?
+  confidenceScore  Float?
+  status           String   // "pending_review" | "confirmed" | "rejected"
+  purpose          String   @default("expense") // "expense" | "revenue"
+  scannedBy        String
+  user             User     @relation("ScannedBy", fields: [scannedBy], references: [id])
+  scannedAt        DateTime @default(now())
+  charge           Charge?
+  revenue          Revenue?
+}
+
+model Charge {
+  id          String   @id @default(uuid())
+  vendorId    String?
+  vendor      Vendor?  @relation(fields: [vendorId], references: [id])
+  receiptId   String?  @unique
+  receipt     Receipt? @relation(fields: [receiptId], references: [id], onDelete: SetNull)
+  payment     Payment?
+  amount      Float
+  category    String   // "fuel_purchase" | "maintenance" | "salary" | "other"
+  date        DateTime
+  description String?
+  createdBy   String
+}
+
+model Revenue {
+  id          String   @id @default(uuid())
+  amount      Float
+  category    String   // "fuel_sales" | "shop_sales" | "services" | "other"
+  date        DateTime
+  description String?
+  createdBy   String
+  createdAt   DateTime @default(now())
+  vendorId    String?
+  vendor      Vendor?  @relation(fields: [vendorId], references: [id])
+  receiptId   String?  @unique
+  receipt     Receipt? @relation(fields: [receiptId], references: [id], onDelete: SetNull)
+}
