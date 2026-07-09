@@ -90,11 +90,13 @@ Extract EVERY receipt you counted. Do not skip any.
 
 For EACH receipt, extract the following fields:
 
-1. "vendor": The supplier name. Look carefully at logos, headers, and letterhead.
-   - "Al Mohit" (may appear as Al Mohit / Al-Mohit / Almohit / المحيط)
-   - "Afriquia" (may appear as Afriquia / Afriqia / أفريقيا)
-   - If neither is recognizable, return "unknown".
-2. "amount": The final TOTAL amount to pay as a decimal number (e.g. 1234.56). Pick the grand total, not a subtotal.
+1. "vendor": The supplier name. Look carefully at logos, headers, letterhead, and payment types to differentiate:
+   - "Al Mohit": Look for "Al Mohit" (or variations like Al-Mohit / Almohit / المحيط) OR look for any mentions of **Chaabi payments** (like "Chaabi", "Banque Populaire", "BP", "Chabi", "chaabi"). If any "Chaabi" or related term is present, classify this as "Al Mohit".
+   - "Afriquia": Look for "Afriquia" (or variations like Afriqia / أفريقيا / AFRIQUIA).
+   - If neither is recognizable or inferred, return "unknown".
+2. "amount": The final TOTAL amount to pay as a decimal number (e.g. 1234.56).
+   - **CRITICAL WARNING:** Always extract the **TOTAL** or **TOTAL A PAYER** or **NET A PAYER**.
+   - **DO NOT INCLUDE THE SOLDE AMOUNT.** There is often a "Solde" (Balance, e.g. "Solde restant", "nouveau solde") on these receipts. Ignore the "Solde" amount completely and always pick the "Total" amount to avoid incorrect entries.
 3. "currency": Usually "MAD" or "DH". Default to "MAD / DH" if unclear.
 4. "fuelType": The fuel type dispensed — look for keywords like "Gasoil", "Diesel", "Gazole", "Essence", "Gasoline", "Sans Plomb", "Super". Return "gasoil" for gasoil/diesel/gazole, "essence" for essence/gasoline/sans plomb/super. If unclear return "unknown".
 5. "date": The receipt date in YYYY-MM-DD format. CRITICAL: You MUST find the actual printed date on the receipt. Look for date stamps, headers. If the date uses DD/MM/YYYY, convert to YYYY-MM-DD. DO NOT use today's date.
