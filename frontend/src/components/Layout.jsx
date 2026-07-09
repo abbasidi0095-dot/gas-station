@@ -131,16 +131,20 @@ export default function Layout({ children }) {
     navigate('/login');
   };
 
-  const navItems = [
-    { name: t('dashboard'), path: '/', icon: LayoutDashboard },
-    { name: t('soldGas'), path: '/sold-gas', icon: Receipt, badge: soldGasCount },
-    { name: t('financials'), path: '/financials', icon: DollarSign },
-    { name: t('staff'), path: '/workers', icon: Users },
-    { name: t('reviewQueue'), path: '/review-queue', icon: ClipboardCheck, badge: pendingCount },
-    { name: t('receipts'), path: '/receipts', icon: Image },
-    { name: 'Factures', path: '/invoices', icon: FileText },
-    { name: t('settings'), path: '/settings', icon: SettingsIcon },
-  ];
+  const navItems = user?.role === 'pompist'
+    ? [
+        { name: "Saisie d'opérations", path: '/pompist', icon: DollarSign },
+      ]
+    : [
+        { name: t('dashboard'), path: '/', icon: LayoutDashboard },
+        { name: t('soldGas'), path: '/sold-gas', icon: Receipt, badge: soldGasCount },
+        { name: t('financials'), path: '/financials', icon: DollarSign },
+        { name: t('staff'), path: '/workers', icon: Users },
+        { name: t('reviewQueue'), path: '/review-queue', icon: ClipboardCheck, badge: pendingCount },
+        { name: t('receipts'), path: '/receipts', icon: Image },
+        { name: 'Factures', path: '/invoices', icon: FileText },
+        { name: t('settings'), path: '/settings', icon: SettingsIcon },
+      ];
 
   const LangSwitcher = () => (
     <div className="relative" ref={langRef}>

@@ -87,6 +87,11 @@ export default function ReviewQueue() {
                       <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-300 bg-indigo-100 dark:bg-indigo-900/50 px-2 py-0.5 rounded">{(((rc.confidenceScore ?? 0) * 100).toFixed(0))}{t('matchPct')}</span>
                     </div>
                     <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">{t('uploaded')}: {new Date(rc.scannedAt).toLocaleString()}</p>
+                    {rc.user && (
+                      <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 mt-0.5">
+                        Saisi par: <span className="text-indigo-600 dark:text-indigo-400">{rc.user.name}</span>
+                      </p>
+                    )}
                     <p className="text-sm font-bold text-slate-800 dark:text-slate-200 mt-2">{rc.amount != null ? `${rc.amount.toFixed(2)} ${rc.currency || 'MAD / DH'}` : t('amountNA')}</p>
                   </div>
                 );

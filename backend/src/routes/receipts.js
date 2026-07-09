@@ -474,4 +474,40 @@ router.post('/sold-gas/manual', authenticate, isAdmin, async (req, res) => {
   }
 });
 
+// POST /api/receipts/pompist/submit
+router.post('/pompist/submit', authenticate, async (req, res) => {
+  const { type, amount, category, date, vendorId, description, fuelType } = req.body;
+
+  if (!type || !amount || !category || !date) {
+    return res.status(400).json({ error: 'Type, montant, catégorie, et date sont obligatoires.' });
+  }
+
+  try {
+    const isCharge = type === 'charge';
+    const receipt = await prisma.receipt.create({
+      data: {
+        imageUrl: '/uploads/manual-entry.png',
+        vendorId: vendorId || null,
+        amount: parseFloat(amount),
+        currency: 'MAD',
+        extractedRawText: description || `Saisie manuelle par ${req.user.name}`,
+        confidenceScore: 1.0,
+        status: 'pending_review',
+        purpose: isCharge ? 'expense' : 'revenue',
+        fuelType: fuelType || null,
+        scannedBy: req.user.id,
+        date: date,
+      },
+    });
+
+    return res.status(201).json({
+      message: 'Opération soumise avec succès pour validation par l\'administrateur.',
+      receipt,
+    });
+  } catch (error) {
+    console.error('Pompist submission error:', error);
+    return res.status(550).json({ error: 'Failed to record pompist entry.' });
+  }
+});
+
 export default router;

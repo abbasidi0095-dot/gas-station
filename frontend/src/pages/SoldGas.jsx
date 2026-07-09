@@ -294,6 +294,11 @@ export default function SoldGas() {
                             <div>
                               <h3 className="font-bold text-slate-900 dark:text-slate-50">{t('soldGasApproveTitle')}</h3>
                               <p className="text-xs text-slate-400 dark:text-slate-500">{t('soldGasApproveDesc')}</p>
+                              {rc.user && (
+                                <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 mt-1">
+                                  Saisi par : <span className="text-emerald-600 dark:text-emerald-400">{rc.user.name}</span>
+                                </p>
+                              )}
                             </div>
 
                             {rc.extractedRawText && (
