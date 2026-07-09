@@ -245,4 +245,61 @@ router.delete('/payments/:id', authenticate, isAdmin, async (req, res) => {
   }
 });
 
+router.delete('/:id', authenticate, isAdmin, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const worker = await prisma.worker.findUnique({
+      where: { id },
+      include: {
+        payments: {
+          include: {
+            charge: true
+          }
+        }
+      }
+    });
+
+    if (!worker) {
+      return res.status(404).json({ error: 'Worker not found.' });
+    }
+
+    await prisma.$transaction(async (tx) => {
+      // 1. Gather all charge IDs and invoice IDs linked to worker payments
+      const chargeIds = [];
+      const invoiceIds = [];
+
+      for (const payment of worker.payments) {
+        if (payment.chargeId) {
+          chargeIds.push(payment.chargeId);
+          if (payment.charge && payment.charge.invoiceId) {
+            invoiceIds.push(payment.charge.invoiceId);
+          }
+        }
+      }
+
+      // 2. Delete payments
+      await tx.payment.deleteMany({ where: { workerId: id } });
+
+      // 3. Delete charges
+      if (chargeIds.length > 0) {
+        await tx.charge.deleteMany({ where: { id: { in: chargeIds } } });
+      }
+
+      // 4. Delete invoices
+      if (invoiceIds.length > 0) {
+        await tx.invoice.deleteMany({ where: { id: { in: invoiceIds } } });
+      }
+
+      // 5. Finally delete the worker
+      await tx.worker.delete({ where: { id } });
+    });
+
+    return res.json({ message: 'Worker and all associated logs deleted successfully.' });
+  } catch (error) {
+    console.error('Delete worker error:', error);
+    return res.status(500).json({ error: 'Failed to delete worker.' });
+  }
+});
+
 export default router;

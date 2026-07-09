@@ -102,6 +102,18 @@ export default function Workers() {
     } catch (err) { console.error(err); }
   };
 
+  const handleDeleteWorker = async (id) => {
+    if (!window.confirm("Êtes-vous sûr de vouloir supprimer cet employé ? Toutes ses fiches de paie et paiements associés seront également supprimés.")) return;
+    try {
+      const res = await fetch(`/api/workers/${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Erreur lors de la suppression.');
+      fetchData();
+    } catch (err) {
+      alert(err.message || 'Erreur lors de la suppression de l\'employé.');
+    }
+  };
+
   const totalPaid = payments.reduce((sum, p) => sum + (p.amount || 0), 0);
 
   const positionOptions = [
@@ -193,8 +205,9 @@ export default function Workers() {
                             <DollarSign className="h-3 w-3" /><span>Payé</span>
                           </button>
                         </td>
-                        <td className="px-3 py-2 text-right">
-                          <button onClick={() => launchEditWorker(w)} className="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 rounded transition-colors"><Edit2 className="h-4 w-4" /></button>
+                        <td className="px-3 py-2 text-right space-x-1">
+                          <button onClick={() => launchEditWorker(w)} className="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 rounded transition-colors" title="Modifier"><Edit2 className="h-4 w-4" /></button>
+                          <button onClick={() => handleDeleteWorker(w.id)} className="p-1 hover:bg-red-50 dark:hover:bg-red-900/30 text-red-500 rounded transition-colors" title="Supprimer"><Trash2 className="h-4 w-4" /></button>
                         </td>
                       </tr>
                     ))}
